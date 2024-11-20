@@ -1,0 +1,17 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            img {
+                width: 100%;
+                height: auto;
+            }
+        </style>
+        <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </head>
+    <body>
+        <img id="live_feed" src="" alt="Live Feed"/>
+    </body>
+</html>

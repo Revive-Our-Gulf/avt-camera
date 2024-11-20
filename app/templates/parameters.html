@@ -1,0 +1,46 @@
+<!-- templates/parameters.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            input, select {
+                display: block;
+                margin-bottom: 10px;
+            }
+            button {
+                padding: 10px 20px;
+                background-color: blue;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            .current-value {
+                font-size: 0.9em;
+                color: gray;
+                margin-left: 10px;
+            }
+        </style>
+        <script src="{{ url_for('static', filename='javascript/socket.io.js') }}"></script>
+        <script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
+    </head>
+    <body>
+        <h1>Camera Parameters</h1>
+        <form id="parametersForm">
+            {% for key, param in parameters.items() %}
+                <label for="{{ key }}">{{ param.label }}:</label>
+                <span id="{{ key }}_current_value" class="current-value">Current: {{ param.value }}</span>
+                {% if param.type == 'select' %}
+                    <select id="{{ key }}" name="{{ key }}">
+                        {% for option in param.options %}
+                            <option value="{{ option }}" {% if option == param.value %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="{{ param.type }}" id="{{ key }}" name="{{ key }}" value="{{ param.value }}" placeholder="Enter {{ param.label }}">
+                {% endif %}
+            {% endfor %}
+            <button type="button" onclick="updateParameters()">Update</button>
+            <button type="button" onclick="resetParameters()">Reset</button>
+        </form>
+    </body>
+</html>
