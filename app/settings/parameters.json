@@ -1,0 +1,66 @@
+{
+    "ExposureAuto": {
+        "label": "Exposure Control Mode",
+        "type": "select",
+        "options": [
+            "Off",
+            "Once",
+            "Continuous"
+        ],
+        "value": "Off"
+    },
+    "ExposureTime": {
+        "label": "Exposure Time (ms)",
+        "type": "number",
+        "value": "20000"
+    },
+    "AcquisitionFrameRate": {
+        "selector": "TriggerSelector",
+        "label": "Acquisition Frame Rate",
+        "type": "number",
+        "value": "2"
+    },
+    "BalanceWhiteAuto": {
+        "label": "White Balance Mode",
+        "type": "select",
+        "options": [
+            "Off",
+            "Once",
+            "Continuous"
+        ],
+        "value": "Off"
+    },
+    "BalanceRatioRed": {
+        "selector": "BalanceRatioSelector",
+        "entry": "Red",
+        "label": "Balance Ratio Red",
+        "type": "number",
+        "value": "2"
+    },
+    "BalanceRatioBlue": {
+        "selector": "BalanceRatioSelector",
+        "entry": "Blue",
+        "label": "Balance Ratio Blue",
+        "type": "number",
+        "value": "2"
+    },
+    "Line2Source": {
+        "selector": "LineSelector",
+        "entry": "Line2",
+        "label": "Line 2 Source",
+        "type": "select",
+        "options": [
+            "Off",
+            "ExposureActive",
+            "FrameTriggerWait",
+            "FrameTrigger",
+            "FrameReadout",
+            "FrameTransfer",
+            "FrameEnd",
+            "FrameStart",
+            "ExposureStart",
+            "ExposureEnd"
+        ],
+        "value": "Off"
+    }
+}
