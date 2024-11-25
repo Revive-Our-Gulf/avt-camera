@@ -1,0 +1,16 @@
+# Ignore all JPEG files and folders in the Recordings directory
+Recordings/
+Recordings/*.jpg
+
+# Ignore everything in the packages directory
+packages/
+
+# Ignore everything in the venv directory
+venv/
+
+# Other common ignores
+*.pyc
+__pycache__/
+.env
+.vscode/
+.DS_Store
