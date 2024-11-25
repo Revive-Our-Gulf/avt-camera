@@ -19,7 +19,7 @@
         <Feature Name="AutoModeRegionOffsetX" Type="Integer" Access="R/W">0</Feature>
         <Feature Name="AutoModeRegionOffsetY" Type="Integer" Access="R/W">0</Feature>
         <Feature Name="AutoModeRegionWidth" Type="Integer" Access="R/W">4112</Feature>
-        <Feature Name="BalanceWhiteAuto" Type="Enumeration" Access="R/W">Off</Feature>
+        <Feature Name="BalanceWhiteAuto" Type="Enumeration" Access="R/W">Continuous</Feature>
         <Feature Name="BalanceWhiteAutoRate" Type="Float" Access="R/W">100.000000</Feature>
         <Feature Name="BalanceWhiteAutoTolerance" Type="Float" Access="R/W">5.000000</Feature>
         <Feature Name="BinningHorizontal" Type="Integer" Access="R/W">1</Feature>
@@ -44,7 +44,7 @@
         <Feature Name="ExposureAutoMax" Type="Float" Access="R/W">9000001.000000</Feature>
         <Feature Name="ExposureAutoMin" Type="Float" Access="R/W">211.272995</Feature>
         <Feature Name="ExposureMode" Type="Enumeration" Access="R/W">Timed</Feature>
-        <Feature Name="ExposureTime" Type="Float" Access="R/W">20000</Feature>
+        <Feature Name="ExposureTime" Type="Float" Access="R/W">1000</Feature>
         <Feature Name="GVCPCmdRetries" Type="Integer" Access="R/W">5</Feature>
         <Feature Name="GVCPCmdTimeout" Type="Integer" Access="R/W">5000</Feature>
         <Feature Name="GVSPBurstSize" Type="Integer" Access="R/W">1</Feature>
@@ -95,8 +95,8 @@
     </FeatureGroup>
     <SelectorGroup Count="7" SelectedFeatures="29">
         <Selector Name="BalanceRatioSelector" Type="Enumeration" SelectedFeatures="1">
-            <SelectorCombination Entry="Red" Feature="BalanceRatio" Type="Float">2</SelectorCombination>
-            <SelectorCombination Entry="Blue" Feature="BalanceRatio" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="Red" Feature="BalanceRatio" Type="Float">1.146973</SelectorCombination>
+            <SelectorCombination Entry="Blue" Feature="BalanceRatio" Type="Float">2.436035</SelectorCombination>
         </Selector>
         <Selector Name="ColorTransformationValueSelector" Type="Enumeration" SelectedFeatures="1">
             <SelectorCombination Entry="Gain00" Feature="ColorTransformationValue" Type="Float">1.000000</SelectorCombination>
@@ -162,43 +162,44 @@
             <SelectorCombination Entry="Timer1" Feature="TimerTriggerSource" Type="Enumeration">Off</SelectorCombination>
             <SelectorCombination Entry="Timer1" Feature="TimerTriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
         </Selector>
-        <Selector Name="TriggerSelector" Type="Enumeration" SelectedFeatures="10">2<SelectorCombination Entry="AcquisitionStart" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
-            <SelectorCombination Entry="AcquisitionStart" Feature="AcquisitionFrameRate" Type="Float">2</SelectorCombination>
+        <Selector Name="TriggerSelector" Type="Enumeration" SelectedFeatures="10">
+            <SelectorCombination Entry="AcquisitionStart" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
+            <SelectorCombination Entry="AcquisitionStart" Feature="AcquisitionFrameRate" Type="Float">2.000000</SelectorCombination>
             <SelectorCombination Entry="AcquisitionStart" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="AcquisitionStart" Feature="TriggerSource" Type="Enumeration">Software</SelectorCombination>
             <SelectorCombination Entry="AcquisitionStart" Feature="TriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
             <SelectorCombination Entry="AcquisitionEnd" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
-            <SelectorCombination Entry="AcquisitionEnd" Feature="AcquisitionFrameRate" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="AcquisitionEnd" Feature="AcquisitionFrameRate" Type="Float">2.000000</SelectorCombination>
             <SelectorCombination Entry="AcquisitionEnd" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="AcquisitionEnd" Feature="TriggerSource" Type="Enumeration">Software</SelectorCombination>
             <SelectorCombination Entry="AcquisitionEnd" Feature="TriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
             <SelectorCombination Entry="AcquisitionActive" Feature="TriggerMode" Type="Enumeration">Off</SelectorCombination>
             <SelectorCombination Entry="AcquisitionActive" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
-            <SelectorCombination Entry="AcquisitionActive" Feature="AcquisitionFrameRate" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="AcquisitionActive" Feature="AcquisitionFrameRate" Type="Float">2.000000</SelectorCombination>
             <SelectorCombination Entry="AcquisitionActive" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="AcquisitionActive" Feature="TriggerSource" Type="Enumeration">Software</SelectorCombination>
             <SelectorCombination Entry="AcquisitionActive" Feature="TriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
             <SelectorCombination Entry="AcquisitionActive" Feature="TriggerDelay" Type="Float">0.000000</SelectorCombination>
             <SelectorCombination Entry="FrameStart" Feature="TriggerMode" Type="Enumeration">Off</SelectorCombination>
             <SelectorCombination Entry="FrameStart" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
-            <SelectorCombination Entry="FrameStart" Feature="AcquisitionFrameRate" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="FrameStart" Feature="AcquisitionFrameRate" Type="Float">2.000000</SelectorCombination>
             <SelectorCombination Entry="FrameStart" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="FrameStart" Feature="TriggerSource" Type="Enumeration">Software</SelectorCombination>
             <SelectorCombination Entry="FrameStart" Feature="TriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
             <SelectorCombination Entry="FrameStart" Feature="TriggerDelay" Type="Float">0.000000</SelectorCombination>
             <SelectorCombination Entry="ExposureStart" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
-            <SelectorCombination Entry="ExposureStart" Feature="AcquisitionFrameRate" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="ExposureStart" Feature="AcquisitionFrameRate" Type="Float">2.000000</SelectorCombination>
             <SelectorCombination Entry="ExposureStart" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="ExposureStart" Feature="TriggerSource" Type="Enumeration">Software</SelectorCombination>
             <SelectorCombination Entry="ExposureStart" Feature="TriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
             <SelectorCombination Entry="ExposureEnd" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
-            <SelectorCombination Entry="ExposureEnd" Feature="AcquisitionFrameRate" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="ExposureEnd" Feature="AcquisitionFrameRate" Type="Float">2.000000</SelectorCombination>
             <SelectorCombination Entry="ExposureEnd" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="ExposureEnd" Feature="TriggerSource" Type="Enumeration">Software</SelectorCombination>
             <SelectorCombination Entry="ExposureEnd" Feature="TriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
             <SelectorCombination Entry="ExposureActive" Feature="TriggerMode" Type="Enumeration">Off</SelectorCombination>
             <SelectorCombination Entry="ExposureActive" Feature="AcquisitionFrameRateEnable" Type="Boolean">True</SelectorCombination>
-            <SelectorCombination Entry="ExposureActive" Feature="AcquisitionFrameRate" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="ExposureActive" Feature="AcquisitionFrameRate" Type="Float">2.000000</SelectorCombination>
             <SelectorCombination Entry="ExposureActive" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="ExposureActive" Feature="TriggerSource" Type="Enumeration">Software</SelectorCombination>
             <SelectorCombination Entry="ExposureActive" Feature="TriggerActivation" Type="Enumeration">RisingEdge</SelectorCombination>
@@ -268,7 +269,7 @@
         <Feature Name="LUTSelector" Type="Enumeration" Access="R/W" />
         <Feature Name="LUTValue" Type="Integer" Access="None" />
         <Feature Name="LineInverter" Type="Boolean" Access="None" />
-        <Feature Name="LineSource" Type="Enumeration" Access="None">Off</Feature>
+        <Feature Name="LineSource" Type="Enumeration" Access="None" />
         <Feature Name="LineStatus" Type="Boolean" Access="R" />
         <Feature Name="LineStatusAll" Type="Integer" Access="R" />
         <Feature Name="PayloadSize" Type="Integer" Access="R" />

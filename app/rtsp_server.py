@@ -14,7 +14,7 @@ mounts = server.get_mount_points()
 
 # define the pipeline to record images ad attach it to the "stream1" endpoint
 vimbasrc_factory = GstRtspServer.RTSPMediaFactory()
-vimbasrc_factory.set_launch('vimbasrc camera=DEV_000A4700155E settingsfile=settings/strobe.xml ! videoconvert ! queue leaky=downstream max-size-buffers=1 ! x264enc speed-preset=ultrafast tune=zerolatency ! rtph264pay name=pay0')
+vimbasrc_factory.set_launch('vimbasrc camera=DEV_000A4700155E ! videoconvert ! x264enc speed-preset=ultrafast tune=zerolatency ! queue ! rtph264pay name=pay0')
 mounts.add_factory("/stream1", vimbasrc_factory)
 server.attach(None)
 

@@ -5,39 +5,42 @@ function updateParameters() {
     var form = document.getElementById('parametersForm');
     var formData = new FormData(form);
     var data = {};
+
     formData.forEach((value, key) => {
         data[key] = value;
     });
+
+    // Display a message saying parameters updated
+    alert('Parameters updated.');
 
     socket.emit('update_parameters', data);
 }
 
 function resetParameters() {
-    var form = document.getElementById('parametersForm');
-    var formData = new FormData(form);
-    var data = {};
-    formData.forEach((value, key) => {
-        data[key] = value;
-    });
-    socket.emit('restore_default_parameters', data);
+    socket.emit('reset_parameters');
 }
 
 socket.on('parameters_updated', function(updatedParameters) {
-    for (var key in updatedParameters) {
-        if (updatedParameters.hasOwnProperty(key)) {
-            var param = updatedParameters[key];
-            var input = document.getElementById(key);
-            var currentValueSpan = document.getElementById(key + '_current_value');
+    for (var param_name in updatedParameters) {
+        if (updatedParameters.hasOwnProperty(param_name)) {
+            var param = updatedParameters[param_name];
+            var input = document.getElementById(param_name);
+            var currentValueSpan = document.getElementById(param_name + '_current_value');
 
             if (input.tagName === 'SELECT') {
-                input.value = param.value;
+                input.value = param;
             } else {
-                input.value = param.value;
+                input.value = param;
             }
 
             if (currentValueSpan) {
-                currentValueSpan.textContent = 'Current: ' + param.value;
+                currentValueSpan.textContent = param;
             }
         }
     }
+});
+
+socket.on('parameters_reset', function(message) {
+    alert(message.message);
+    location.reload();
 });

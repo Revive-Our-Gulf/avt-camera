@@ -1,66 +1,64 @@
 {
     "ExposureAuto": {
-        "label": "Exposure Control Mode",
         "type": "select",
         "options": [
             "Off",
             "Once",
             "Continuous"
         ],
-        "value": "Off"
+        "label": "Exposure Auto"
     },
     "ExposureTime": {
-        "label": "Exposure Time (ms)",
         "type": "number",
-        "value": "20000"
+        "label": "Exposure Time"
     },
-    "AcquisitionFrameRate": {
-        "selector": "TriggerSelector",
-        "label": "Acquisition Frame Rate",
-        "type": "number",
-        "value": "2"
-    },
-    "BalanceWhiteAuto": {
-        "label": "White Balance Mode",
+    "GainAuto": {
         "type": "select",
         "options": [
             "Off",
             "Once",
             "Continuous"
         ],
-        "value": "Off"
+        "label": "Gain Auto"
     },
-    "BalanceRatioRed": {
-        "selector": "BalanceRatioSelector",
+    "Gain": {
+        "type": "number",
+        "label": "Gain"
+    },
+    "AcquisitionFrameRate": {
+        "type": "number",
+        "label": "Acquisition Frame Rate"
+    },
+    "BalanceWhiteAuto": {
+        "type": "select",
+        "options": [
+            "Off",
+            "Once",
+            "Continuous"
+        ],
+        "label": "Balance White Auto"
+    },
+    "BalanceRatio+Red": {
         "entry": "Red",
-        "label": "Balance Ratio Red",
+        "feature": "BalanceRatio",
         "type": "number",
-        "value": "2"
+        "label": "Balance Ratio Red"
     },
-    "BalanceRatioBlue": {
-        "selector": "BalanceRatioSelector",
+    "BalanceRatio+Blue": {
         "entry": "Blue",
-        "label": "Balance Ratio Blue",
+        "feature": "BalanceRatio",
         "type": "number",
-        "value": "2"
+        "label": "Balance Ratio Blue"
     },
-    "Line2Source": {
-        "selector": "LineSelector",
+    "Line2+LineSource": {
         "entry": "Line2",
-        "label": "Line 2 Source",
+        "feature": "LineSource",
         "type": "select",
         "options": [
             "Off",
             "ExposureActive",
-            "FrameTriggerWait",
-            "FrameTrigger",
-            "FrameReadout",
-            "FrameTransfer",
-            "FrameEnd",
-            "FrameStart",
-            "ExposureStart",
-            "ExposureEnd"
+            "FrameTriggerWait"
         ],
-        "value": "Off"
+        "label": "Line 2 Line Source"
     }
 }

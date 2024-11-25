@@ -1,46 +1,48 @@
-<!-- templates/parameters.html -->
-<!DOCTYPE html>
-<html>
-    <head>
-        <style>
-            input, select {
-                display: block;
-                margin-bottom: 10px;
-            }
-            button {
-                padding: 10px 20px;
-                background-color: blue;
-                color: white;
-                border: none;
-                cursor: pointer;
-            }
-            .current-value {
-                font-size: 0.9em;
-                color: gray;
-                margin-left: 10px;
-            }
-        </style>
-        <script src="{{ url_for('static', filename='javascript/socket.io.js') }}"></script>
-        <script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
-    </head>
-    <body>
+{% extends "base.html" %}
+
+{% block title %}Parameters - RTSP Server{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
         <h1>Camera Parameters</h1>
         <form id="parametersForm">
-            {% for key, param in parameters.items() %}
-                <label for="{{ key }}">{{ param.label }}:</label>
-                <span id="{{ key }}_current_value" class="current-value">Current: {{ param.value }}</span>
-                {% if param.type == 'select' %}
-                    <select id="{{ key }}" name="{{ key }}">
-                        {% for option in param.options %}
-                            <option value="{{ option }}" {% if option == param.value %}selected{% endif %}>{{ option }}</option>
-                        {% endfor %}
-                    </select>
-                {% else %}
-                    <input type="{{ param.type }}" id="{{ key }}" name="{{ key }}" value="{{ param.value }}" placeholder="Enter {{ param.label }}">
-                {% endif %}
+            <div class="row font-weight-bold">
+                <div class="col-md-4">Setting</div>
+                <div class="col-md-4">Current Value</div>
+                <div class="col-md-4">New Value</div>
+            </div>
+            {% for param_name, param_info in parameters.items() %}
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="{{ param_name }}">{{ param_info.label }}:</label>
+                    </div>
+                    <div class="col-md-4">
+                        <span id="{{ param_name }}_current_value" class="current-value">{{ values[param_name] }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        {% if param_info.type == 'select' %}
+                            <select id="{{ param_name }}" name="{{ param_name }}" class="form-control">
+                                {% for option in param_info.options %}
+                                    <option value="{{ option }}" {% if option == values[param_name] %}selected{% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <input type="{{ param_info.type }}" id="{{ param_name }}" name="{{ param_name }}" value="{{ values[param_name] }}" class="form-control" placeholder="Enter {{ param_info.label }}">
+                        {% endif %}
+                    </div>
+                </div>
             {% endfor %}
-            <button type="button" onclick="updateParameters()">Update</button>
-            <button type="button" onclick="resetParameters()">Reset</button>
+            <div class="row">
+                <div class="col-md-12 text-right">
+                    <button type="button" class="btn btn-primary" onclick="updateParameters()">Update</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetParameters()">Reset</button>
+                </div>
+            </div>
         </form>
-    </body>
-</html>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='javascript/socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
+{% endblock %}
