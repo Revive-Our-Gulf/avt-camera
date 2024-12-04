@@ -16,7 +16,7 @@ from vmbpy import *
 
 from gstreamer import GstPipeline, GstContext, Gst
 from utils import network_utils, record_utils, camera_utils, xml_utils, json_utils, pipeline_utils
-import handlers as handlers
+from handlers import handlers
 
 from memory_profiler import profile, LogFile
 
