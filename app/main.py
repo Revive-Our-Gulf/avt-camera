@@ -15,10 +15,9 @@ from PIL import Image
 from vmbpy import *
 
 from gstreamer import GstPipeline, GstContext, Gst
-from utils import network_utils, record_utils, camera_utils, xml_utils, json_utils, pipeline_utils
+import utils
 from handlers import handlers
 
-from memory_profiler import profile, LogFile
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -30,11 +29,14 @@ record_folder = "transect"  # Default folder name
 DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/current.xml name=vimbasrc ! "
                     "video/x-bayer,format=rggb ! bayer2rgb ! videoconvert ! tee name=t "
 
-                    "t. ! queue ! videoscale ! capsfilter name=capsfilter_stream caps=video/x-raw,width=2056,height=1504 ! "
-                    "jpegenc ! multifilesink name=filesink_stream location=Recordings/stream.jpg "
+                    "t. ! queue ! "
+                    "videoscale ! capsfilter name=capsfilter_stream caps=video/x-raw,width=1028,height=752 ! "
+                    "jpegenc ! "
+                    "multifilesink name=filesink_stream location=Recordings/stream.jpg "
 
-                    "t. ! queue ! valve name=record_valve drop=true ! jpegenc ! "
-                    "multifilesink name=filesink_record location=Recordings/")
+                    "t. ! queue ! "
+                    "valve name=record_valve drop=true ! jpegenc ! "
+                    "multifilesink name=filesink_record location=Recordings/stream.jpg")
 
 
 @app.route("/")
@@ -55,8 +57,8 @@ def last_frame():
 
 @app.route('/parameters')
 def parameters():
-    parameters = json_utils.get_parameters('settings/parameters.json')
-    values = xml_utils.get_values_from_xml('settings/current.xml', parameters)
+    parameters = utils.json.get_parameters('settings/parameters.json')
+    values = utils.xmls.get_values_from_xml('settings/current.xml', parameters)
     
     print(f" Parameters: {parameters}")
     print(f" Values : {values}")
@@ -64,18 +66,19 @@ def parameters():
     return render_template('parameters.html', parameters=parameters, values=values)
     
 
-@profile(stream=LogFile('memory_profile.log', reportIncrementFlag=False))
 def main():
     global is_recording, was_recording, record_folder
     was_recording = False  # Initialize was_recording
 
-    camera_utils.wait_for_camera('DEV_000A4700155E')
-    network_utils.modify_mtu()
+    utils.camera.wait_for_camera('DEV_000A4700155E')
+    utils.network.modify_mtu()
+
+    utils.storage.ensure_stream_image_exists()
 
     try:
         with GstContext(), GstPipeline(DEFAULT_PIPELINE) as pipeline:         
             
-            pipeline_utils.setup_pipeline(pipeline)
+            utils.pipeline.setup_pipeline(pipeline)
 
             def handle_toggle_recording_wrapper(data):
                 global is_recording, record_folder
@@ -84,14 +87,14 @@ def main():
             socketio.on_event('toggle_recording', handle_toggle_recording_wrapper)
             socketio.on_event('update_parameters', lambda data: handlers.handle_update_parameters(data, pipeline))
             socketio.on_event('reset_parameters', lambda: handlers.handle_reset_parameters(pipeline))
-            socketio.on_event('restart_pipeline', lambda: pipeline_utils.restart_pipeline(pipeline))
+            socketio.on_event('restart_pipeline', lambda: utils.pipeline.restart_pipeline(pipeline))
 
             while True:
                 if not pipeline.is_done:
                     if is_recording and not was_recording:
-                        pipeline_utils.start_recording(pipeline, record_folder)
+                        utils.pipeline.start_recording(pipeline, record_folder)
                     elif not is_recording and was_recording:
-                        pipeline_utils.stop_recording(pipeline)
+                        utils.pipeline.stop_recording(pipeline)
                     
 
                     with open('Recordings/stream.jpg', 'rb') as image_file:

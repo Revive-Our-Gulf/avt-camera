@@ -1,5 +1,6 @@
 import os
 import logging
+from PIL import Image
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,3 +22,25 @@ def create_recording_folder(base_folder_name):
     os.makedirs(folder_path, exist_ok=True)
     logging.info(f"Folder created at path: {folder_path}")
     return folder_path
+
+
+
+def ensure_stream_image_exists():
+    image_path = os.path.join("Recordings", "stream.jpg")
+    if not os.path.exists(image_path):
+        logging.info(f"{image_path} does not exist. Creating a blank image.")
+        create_blank_jpg()
+    else:
+        logging.info(f"{image_path} already exists.")
+
+def create_blank_jpg():
+
+    width, height = 4112, 3008
+    color = (255, 255, 255)  # white
+
+    image = Image.new("RGB", (width, height), color)
+    image_path = os.path.join("Recordings", "stream.jpg")
+    image.save(image_path, "JPEG")
+    logging.info(f"Blank image created at path: {image_path}")
+
+    return image_path

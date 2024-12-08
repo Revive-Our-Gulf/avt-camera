@@ -1,5 +1,4 @@
-from utils import xml_utils, json_utils, camera_utils, pipeline_utils
-import json
+from utils import xml
 from flask_socketio import emit
 
 def handle_toggle_recording(data, pipeline):
@@ -14,12 +13,12 @@ def handle_toggle_recording(data, pipeline):
 
 def handle_update_parameters(data, pipeline):
 
-    root = xml_utils.read('settings/current.xml')
+    root = xml.read('settings/current.xml')
 
     print(f" data is {data}")
 
-    xml_utils.update_from_json(root, data)
-    xml_utils.write(root, 'settings/current.xml')
+    xml.update_from_json(root, data)
+    xml.write(root, 'settings/current.xml')
 
     
     
@@ -28,18 +27,18 @@ def handle_update_parameters(data, pipeline):
 
 
 
-    pipeline_utils.restart_pipeline(pipeline)
+    pipeline.restart_pipeline(pipeline)
 
     for param_name, param_value in data.items():
         if param_name == "StreamResolution":
             print("Updating stream resolution")
-            pipeline = pipeline_utils.update_stream_resolution(pipeline, param_value)
+            pipeline = pipeline.update_stream_resolution(pipeline, param_value)
 
 def handle_reset_parameters(pipeline):
-    root = xml_utils.read('settings/default.xml')
-    xml_utils.write(root, 'settings/current.xml')
+    root = xml.read('settings/default.xml')
+    xml.write(root, 'settings/current.xml')
 
     
     # Emit a reset event to the client
     emit('parameters_reset', {'message': 'Parameters have been reset to default settings.'})
-    pipeline_utils.restart_pipeline(pipeline)
+    pipeline.restart_pipeline(pipeline)
