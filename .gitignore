@@ -1,6 +1,6 @@
 # Ignore all JPEG files and folders in the Recordings directory
-Recordings/
-Recordings/*.jpg
+recordings/
+recordings/*.jpg
 
 # Ignore everything in the packages directory
 packages/
