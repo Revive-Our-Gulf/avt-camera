@@ -18,7 +18,6 @@ from gstreamer import GstPipeline, GstContext, Gst
 import utils
 from handlers import handlers
 
-
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -32,11 +31,11 @@ DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/curr
                     "t. ! queue ! "
                     "videoscale ! capsfilter name=capsfilter_stream caps=video/x-raw,width=1028,height=752 ! "
                     "jpegenc ! "
-                    "multifilesink name=filesink_stream location=Recordings/stream.jpg "
+                    "multifilesink name=filesink_stream location=/home/pi/Repos/avt/recordings/stream.jpg "
 
                     "t. ! queue ! "
                     "valve name=record_valve drop=true ! jpegenc ! "
-                    "multifilesink name=filesink_record location=Recordings/stream.jpg")
+                    "multifilesink name=filesink_record location=/home/pi/Repos/avt/recordings/stream.jpg")
 
 
 @app.route("/")
@@ -53,7 +52,7 @@ def stream():
 
 @app.route('/last_frame')
 def last_frame():
-    return send_file('Recordings/stream.jpg', mimetype='image/jpeg')
+    return send_file('/home/pi/Repos/avt/recordings/stream.jpg', mimetype='image/jpeg')
 
 @app.route('/parameters')
 def parameters():
@@ -97,7 +96,7 @@ def main():
                         utils.pipeline.stop_recording(pipeline)
                     
 
-                    with open('Recordings/stream.jpg', 'rb') as image_file:
+                    with open('home/pi/Repos/avt/recordings/stream.jpg', 'rb') as image_file:
                         image_data = image_file.read()
                         encoded_image = base64.b64encode(image_data).decode('utf-8')
                         socketio.emit('image_update', {'image': encoded_image})
@@ -109,7 +108,7 @@ def main():
         print("Cleaning up and saving memory profile log...")
 
 if __name__ == "__main__":
-    thread = threading.Thread(target=lambda: socketio.run(app, host='192.168.2.3', port=5000, debug=True, use_reloader=False))
+    thread = threading.Thread(target=lambda: socketio.run(app, host='192.168.2.3', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True))
     thread.daemon = True
     thread.start()
     main()

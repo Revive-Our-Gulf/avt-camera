@@ -1,0 +1,16 @@
+[Unit]
+Description=AVT Camera Flask Application Service
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+Environment="VIMBA_HOME=/opt/Vimba_6_0/VimbaC/"
+Environment="GENICAM_GENTL64_PATH=/opt/Vimba_6_0/VimbaGigETL/CTI/arm_64bit:/opt/VimbaX_2024-1/cti"
+Environment="GST_PLUGIN_PATH=/usr/local/lib/gstreamer-1.0"
+ExecStartPre=/bin/sleep 30
+ExecStart=/home/pi/Repos/avt/app/venv/bin/python3 /home/pi/Repos/avt/app/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

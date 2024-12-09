@@ -6,7 +6,7 @@ from PIL import Image
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def create_recording_folder(base_folder_name):
-    base_path = os.path.join("Recordings", base_folder_name)
+    base_path = os.path.join("home/pi/Repos/avt/recordings", base_folder_name)
     folder_path = base_path + "_1"
     counter = 1
 
@@ -26,21 +26,22 @@ def create_recording_folder(base_folder_name):
 
 
 def ensure_stream_image_exists():
-    image_path = os.path.join("Recordings", "stream.jpg")
+    image_path = get_image_path("stream.jpg")
     if not os.path.exists(image_path):
         logging.info(f"{image_path} does not exist. Creating a blank image.")
-        create_blank_jpg()
+        create_blank_jpg(image_path)
     else:
         logging.info(f"{image_path} already exists.")
 
-def create_blank_jpg():
-
+def create_blank_jpg(image_path):
     width, height = 4112, 3008
     color = (255, 255, 255)  # white
 
     image = Image.new("RGB", (width, height), color)
-    image_path = os.path.join("Recordings", "stream.jpg")
     image.save(image_path, "JPEG")
     logging.info(f"Blank image created at path: {image_path}")
 
     return image_path
+
+def get_image_path(filename):
+    return os.path.join("home/pi/Repos/avt/recordings", filename)
