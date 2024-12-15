@@ -6,7 +6,8 @@ from flask import Flask, send_file, render_template
 from flask_socketio import SocketIO
 from vmbpy import *
 
-from gstreamer import GstPipeline, GstContext, Gst
+from gstreamer import GstContext, GstPipeline, GstApp, Gst, GstVideo, GstPipeline
+import gstreamer.utils as gst_utils
 import utils
 from handlers import handlers
 
@@ -19,7 +20,11 @@ import shutil
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GObject  
+import numpy as np
 
+import typing as typ
+
+import cv2
 
 
 app = Flask(__name__)
@@ -37,11 +42,18 @@ DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/curr
                     "t. ! queue ! "
                     "videoscale ! capsfilter name=capsfilter_stream caps=video/x-raw,width=1028,height=752 ! "
                     "jpegenc ! "
-                    "multifilesink name=filesink_stream location=/home/pi/Repos/avt/recordings/stream.jpg "
+                    # "fakesink "
+                    "multifilesink name=filesink_stream location=/home/pi/Repos/avt/stream.jpg "
 
                     "t. ! queue ! "
-                    "valve name=record_valve drop=true ! jpegenc ! "
-                    "multifilesink name=filesink_record location=/home/pi/Repos/avt/recordings/stream.jpg post-messages=true")
+                    # "valve name=record_valve drop=false ! "
+                    # "jpegenc ! "
+                    # "multifilesink name=filesink_record location=/home/pi/Repos/avt/recordings/stream.jpg post-messages=true")
+                    "videoconvert ! "
+                    "video/x-raw,format=RGB ! "
+                    "appsink name=appsink_record emit-signals=false")
+
+
 
 
 @app.route("/")
@@ -76,7 +88,7 @@ def emit_images():
     last_image_data = None
 
     while True:
-        with open('/home/pi/Repos/avt/recordings/stream.jpg', 'rb') as image_file:
+        with open('/home/pi/Repos/avt/stream.jpg', 'rb') as image_file:
             image_data = image_file.read()
             if image_data != last_image_data:
                 encoded_image = base64.b64encode(image_data).decode('utf-8')
@@ -97,7 +109,7 @@ def main():
     try:
         with GstContext(), GstPipeline(DEFAULT_PIPELINE) as pipeline:         
             
-            utils.pipeline.setup_pipeline(pipeline)
+            # utils.pipeline.setup_pipeline(pipeline)
 
             def handle_toggle_recording_wrapper(data):
                 global is_recording, record_folder
@@ -112,12 +124,15 @@ def main():
             image_thread.daemon = True
             image_thread.start()
 
+            pipeline.get_by_name("filesink_stream").set_state(Gst.State.NULL)
+            pipeline.get_by_name("filesink_stream").set_state(Gst.State.PLAYING)
+
             while True:
                 if not pipeline.is_done:
                     if is_recording and not was_recording:
-                        utils.pipeline.start_recording(pipeline, record_folder)
+                        utils.pipeline.recording.start(pipeline, record_folder)
                     elif not is_recording and was_recording:
-                        utils.pipeline.stop_recording(pipeline)
+                        utils.pipeline.recording.stop(pipeline)
                     
                     was_recording = is_recording
                 time.sleep(.25)
