@@ -15,6 +15,8 @@ import typing as typ
 
 import cv2
 
+from datetime import datetime
+
 
 image_counter = 0
 global_record_path = None
@@ -35,7 +37,7 @@ def start(pipeline, record_path):
 
 def save_image(array):
     global image_counter, global_record_path
-    timestamp = int(time.time())
+    timestamp = datetime.now().isoformat()
     filename = global_record_path + f"/IMG_{image_counter}({timestamp}).jpg"
     cv2.imwrite(filename, array)
     image_counter += 1
