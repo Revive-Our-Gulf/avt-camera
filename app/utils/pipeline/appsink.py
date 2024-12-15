@@ -26,8 +26,9 @@ def stop(pipeline):
     appsink.set_property("emit_signals", False)
 
 def start(pipeline, record_path):
-    global global_record_path
+    global image_counter, global_record_path
     global_record_path = record_path
+    image_counter = 0
     appsink = pipeline.get_by_name("appsink_record")
     appsink.set_property("emit_signals", True)
 
