@@ -1,6 +1,7 @@
 # Ignore all JPEG files and folders in the Recordings directory
 recordings/
 recordings/*.jpg
+experiments/
 
 # Ignore everything in the packages directory
 packages/
@@ -14,3 +15,6 @@ __pycache__/
 .env
 .vscode/
 .DS_Store
+*.tiff
+*.jpeg
+*.png
