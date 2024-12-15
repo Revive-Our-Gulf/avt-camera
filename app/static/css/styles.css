@@ -5,6 +5,7 @@ body, html {
     display: flex;
     flex-direction: column;
 }
+
 #content {
     flex: 1;
     display: flex;
@@ -13,24 +14,44 @@ body, html {
     justify-content: center;
     overflow-y: auto;
     padding: 20px;
+    max-height: 100%;
 }
+
 img {
     max-width: 100%;
+    max-height: 100%;
     height: auto;
+    width: auto;
+    object-fit: contain; /* Ensure the image fits within the container */
 }
+
+.streamRow {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
 #recordButton {
     background-color: green;
     color: white;
-    padding: 10px 20px;
     border: none;
     cursor: pointer;
     margin-top: 10px;
+    white-space: nowrap; /* Prevent text overflow */
 }
-#recordingInfo {
+
+#restartButton {
     margin-top: 10px;
+    white-space: nowrap; /* Prevent text overflow */
 }
-input[type="text"], #recordButton {
+
+#folderName {
     margin-top: 10px;
     padding: 5px;
-    height: calc(1.5em + .75rem + 2px); /* Match the height of form-control */
+    width: 100%; /* Ensure the input field takes full width */
+}
+
+#recordingInfo {
+    margin-top: 10px;
 }

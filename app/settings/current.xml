@@ -44,7 +44,7 @@
         <Feature Name="ExposureAutoMax" Type="Float" Access="R/W">9000001.000000</Feature>
         <Feature Name="ExposureAutoMin" Type="Float" Access="R/W">211.272995</Feature>
         <Feature Name="ExposureMode" Type="Enumeration" Access="R/W">Timed</Feature>
-        <Feature Name="ExposureTime" Type="Float" Access="R/W">1000</Feature>
+        <Feature Name="ExposureTime" Type="Float" Access="R/W">4000</Feature>
         <Feature Name="GVCPCmdRetries" Type="Integer" Access="R/W">5</Feature>
         <Feature Name="GVCPCmdTimeout" Type="Integer" Access="R/W">5000</Feature>
         <Feature Name="GVSPBurstSize" Type="Integer" Access="R/W">1</Feature>
@@ -57,7 +57,7 @@
         <Feature Name="GVSPPacketSize" Type="Integer" Access="R/W">9000</Feature>
         <Feature Name="GVSPTiltingSize" Type="Integer" Access="R/W">100</Feature>
         <Feature Name="GVSPTimeout" Type="Integer" Access="R/W">70</Feature>
-        <Feature Name="Gain" Type="Float" Access="R/W">0.000000</Feature>
+        <Feature Name="Gain" Type="Float" Access="R/W">12</Feature>
         <Feature Name="GainAuto" Type="Enumeration" Access="R/W">Off</Feature>
         <Feature Name="GainAutoMax" Type="Float" Access="R/W">24.000002</Feature>
         <Feature Name="GainAutoMin" Type="Float" Access="R/W">0.000000</Feature>
@@ -95,8 +95,8 @@
     </FeatureGroup>
     <SelectorGroup Count="7" SelectedFeatures="29">
         <Selector Name="BalanceRatioSelector" Type="Enumeration" SelectedFeatures="1">
-            <SelectorCombination Entry="Red" Feature="BalanceRatio" Type="Float">1.146973</SelectorCombination>
-            <SelectorCombination Entry="Blue" Feature="BalanceRatio" Type="Float">2.436035</SelectorCombination>
+            <SelectorCombination Entry="Red" Feature="BalanceRatio" Type="Float">2</SelectorCombination>
+            <SelectorCombination Entry="Blue" Feature="BalanceRatio" Type="Float">2.25</SelectorCombination>
         </Selector>
         <Selector Name="ColorTransformationValueSelector" Type="Enumeration" SelectedFeatures="1">
             <SelectorCombination Entry="Gain00" Feature="ColorTransformationValue" Type="Float">1.000000</SelectorCombination>
