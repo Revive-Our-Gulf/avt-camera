@@ -39,7 +39,10 @@ def save_image(array):
     global image_counter, global_record_path
     timestamp = datetime.now().isoformat()
     filename = global_record_path + f"/IMG_{image_counter}({timestamp}).jpg"
-    cv2.imwrite(filename, array)
+    
+    rgb_image = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
+    
+    cv2.imwrite(filename, rgb_image)
     image_counter += 1
 
 
@@ -69,12 +72,12 @@ def extract_buffer(sample: Gst.Sample) -> np.ndarray:
 
     buffer = sample.get_buffer()  # Gst.Buffer
 
-    print(buffer.pts, buffer.dts, buffer.offset)
+    # print(buffer.pts, buffer.dts, buffer.offset)
 
     caps_format = sample.get_caps().get_structure(0)  # Gst.Structure
 
     # Print out the details of the caps_format
-    print("Caps format:", caps_format.to_string())
+    # print("Caps format:", caps_format.to_string())
 
     # GstVideo.VideoFormat
     video_format = GstVideo.VideoFormat.from_string(
@@ -83,7 +86,7 @@ def extract_buffer(sample: Gst.Sample) -> np.ndarray:
     w, h = caps_format.get_value('width'), caps_format.get_value('height')
     c = gst_utils.get_num_channels(video_format)
 
-    print(f"Width: {w}, Height: {h}, Channels: {c}")
+    # print(f"Width: {w}, Height: {h}, Channels: {c}")
 
     buffer_size = buffer.get_size()
     array = np.ndarray(shape=(h, w, c), buffer=buffer.extract_dup(0, buffer_size),
