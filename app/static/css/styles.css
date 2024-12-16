@@ -32,23 +32,13 @@ img {
     margin-top: 10px;
 }
 
-#recordButton {
-    background-color: green;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-top: 10px;
-    white-space: nowrap; /* Prevent text overflow */
-}
-
 #restartButton {
-    margin-top: 10px;
     white-space: nowrap; /* Prevent text overflow */
+    height: 100%;
+    width: auto;
 }
 
 #folderName {
-    margin-top: 10px;
-    padding: 5px;
     width: 100%; /* Ensure the input field takes full width */
 }
 

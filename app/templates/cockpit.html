@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}RTSP Server{% endblock %}</title>
+    <link href="{{ url_for('static', filename='bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='bootstrap/jquery-slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascript/socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascript/record.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascript/stream.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
+    <script>
+        function restartPipeline() {
+            socket.emit('restart_pipeline');
+        }
+    </script>
+    <style>
+        .record-button {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(255, 112, 83);
+            border: none;
+            border-radius: 20%;
+            aspect-ratio: 1;
+        }
+
+        .record-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 50%;
+            background-color: red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .record-button.recording {
+            background-color: rgba(255, 255, 255, 0.713);
+        }
+
+        .record-button.recording::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 50%;
+            background-color: red;
+            border-radius: 0;
+            transform: translate(-50%, -50%);
+        }
+
+        .input-row {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="row input-row">
+        <div class="col-md-6">
+            <input type="text" id="folderName" class="form-control" placeholder="Enter folder name">
+        </div>
+        <div class="col-md-1">
+            <button id="recordButton" class="btn record-button" onclick="toggleRecording()"></button>
+        </div>
+        <div class="col-md-2">
+            <div id="timeRecording" class="text-center">0:00</div>
+        </div>  
+        <div class="col-md-1">
+            <button id="restartButton" class="btn btn-warning btn-block" onclick="restartPipeline()">Restart Camera</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <img id="live_feed" src="" alt="Live Feed" class="img-fluid mb-2"/>
+        </div>
+    </div>
+</body>
+</html>

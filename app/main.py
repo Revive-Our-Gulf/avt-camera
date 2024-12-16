@@ -1,6 +1,7 @@
 import threading
 import time
 import base64
+from datetime import datetime
 
 from flask import Flask, send_file, render_template
 from flask_socketio import SocketIO
@@ -21,6 +22,7 @@ socketio = SocketIO(app)
 is_recording = False  # Global variable to control recording state
 was_recording = False  # Global variable to track previous recording state
 record_folder = "transect"  # Default folder name
+start_time = None  # Variable to track the start time of the recording
 
 DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/current.xml name=vimbasrc ! "
                     "video/x-bayer,format=rggb ! bayer2rgb ! videoconvert ! "
@@ -36,12 +38,13 @@ DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/curr
                     "video/x-raw,format=RGB ! "
                     "appsink name=appsink_record emit-signals=true")
 
-
-
-
 @app.route("/")
 def main():
     return render_template('index.html')
+
+@app.route("/cockpit")
+def cockpit():
+    return render_template('cockpit.html')
 
 @app.route("/record")
 def record_input():
@@ -65,7 +68,6 @@ def parameters():
 
     return render_template('parameters.html', parameters=parameters, values=values)
 
-
 def emit_images():
     global is_recording, was_recording
     last_image_data = None
@@ -79,9 +81,14 @@ def emit_images():
                 last_image_data = image_data
         time.sleep(0.1)  # Emit images at 10 frames per second (100 ms delay)
 
+@socketio.on('get_recording_state')
+def emit_recording_state():
+    global start_time, is_recording
+    elapsed_time = (time.time() - start_time) if is_recording else 0
+    socketio.emit('current_recording_state', {'isRecording': is_recording, 'elapsedTime': elapsed_time})
 
 def main():
-    global is_recording, was_recording, record_folder
+    global is_recording, was_recording, record_folder, start_time
     was_recording = False  # Initialize was_recording
 
     utils.camera.wait_for_camera('DEV_000A4700155E')
@@ -98,10 +105,17 @@ def main():
                 global is_recording, record_folder
                 is_recording, record_folder = handlers.handle_toggle_recording(data, pipeline)
 
+            def handle_restart_pipeline():
+                global is_recording, start_time
+                utils.pipeline.config.restart(pipeline)
+                is_recording = False
+                start_time = 0
+
+
             socketio.on_event('toggle_recording', handle_toggle_recording_wrapper)
             socketio.on_event('update_parameters', lambda data: handlers.handle_update_parameters(data, pipeline))
             socketio.on_event('reset_parameters', lambda: handlers.handle_reset_parameters(pipeline))
-            socketio.on_event('restart_pipeline', lambda: utils.pipeline.restart_pipeline(pipeline))
+            socketio.on_event('restart_pipeline', handle_restart_pipeline)
 
             image_thread = threading.Thread(target=emit_images)
             image_thread.daemon = True
@@ -111,8 +125,10 @@ def main():
                 if not pipeline.is_done:
                     if is_recording and not was_recording:
                         utils.pipeline.recording.start(pipeline, record_folder)
+                        start_time = time.time()
                     elif not is_recording and was_recording:
                         utils.pipeline.recording.stop(pipeline)
+                        start_time = None
                     
                     was_recording = is_recording
                 time.sleep(.25)

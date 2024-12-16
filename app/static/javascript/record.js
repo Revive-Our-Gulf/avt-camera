@@ -1,72 +1,52 @@
 var socket = io();
-var isRecording = false;
-var recordingStartTime = null;
-var recordingInterval = null;
+var isRecording = false; // Add this variable to track the recording state
 
 function toggleRecording() {
-    var button = document.getElementById('recordButton');
     var folderNameInput = document.getElementById('folderName');
     var folderName = folderNameInput.value.trim() || 'transect';
 
-    isRecording = !isRecording;
+    isRecording = !isRecording; // Toggle the recording state
 
-    if (isRecording) {
-        button.style.backgroundColor = "red";
-        button.textContent = "Stop";
-        recordingStartTime = Date.now();
-
-        recordingInterval = setInterval(function() {
-            var elapsedTime = Math.floor((Date.now() - recordingStartTime) / 1000);
-            var recordingDuration = document.getElementById('recordingDuration');
-            if (recordingDuration) {
-                recordingDuration.textContent = elapsedTime;
-            }
-        }, 1000);
-    } else {
-        button.style.backgroundColor = "green";
-        button.textContent = "Start";
-        clearInterval(recordingInterval);
-        var recordingDuration = document.getElementById('recordingDuration');
-        if (recordingDuration) {
-            recordingDuration.textContent = "0";
-        }
-    }
-
+    console.log("Toggling recording state:", isRecording);
     socket.emit('toggle_recording', { isRecording: isRecording, folderName: folderName });
 }
 
-function updateExposureTime() {
-    var exposureTime = document.getElementById('exposureTime').value;
-    socket.emit('update_exposure_time', { exposureTime: exposureTime });
+function updateRecordingState(recording, elapsedTime) {
+    var button = document.getElementById('recordButton');
+    isRecording = recording; // Update the local isRecording variable
+
+    if (isRecording) {
+        button.classList.add('recording');
+    } else {
+        button.classList.remove('recording');
+    }
+    console.log("Elapsed time:", elapsedTime);
+    updateTimeDisplay(elapsedTime);
+}
+
+function updateTimeDisplay(elapsedTime) {
+    var timeRecording = document.getElementById('timeRecording');
+    if (isRecording) {
+        var minutes = Math.floor(elapsedTime / 60);
+        var seconds = Math.floor(elapsedTime % 60);
+        timeRecording.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    } else {
+        timeRecording.textContent = "0:00";
+    }
 }
 
 socket.on('recording_state_updated', function(data) {
-    var button = document.getElementById('recordButton');
-    var currentFolderName = document.getElementById('currentFolderName');
-    var recordingDuration = document.getElementById('recordingDuration');
+    console.log("Received recording_state_updated:", data);
+    updateRecordingState(data.isRecording, data.elapsedTime);
+});
 
-    isRecording = data.isRecording;
-    if (currentFolderName) {
-        currentFolderName.textContent = data.folderName;
-    }
+window.onload = function() {
+    socket.emit('get_recording_state');
+    setInterval(function() {
+        socket.emit('get_recording_state');
+    }, 1000); // Request the recording state every second
+};
 
-    if (isRecording) {
-        button.style.backgroundColor = "red";
-        button.textContent = "Stop";
-        recordingStartTime = Date.now();
-
-        recordingInterval = setInterval(function() {
-            var elapsedTime = Math.floor((Date.now() - recordingStartTime) / 1000);
-            if (recordingDuration) {
-                recordingDuration.textContent = elapsedTime;
-            }
-        }, 1000);
-    } else {
-        button.style.backgroundColor = "green";
-        button.textContent = "Start";
-        clearInterval(recordingInterval);
-        if (recordingDuration) {
-            recordingDuration.textContent = "0";
-        }
-    }
+socket.on('current_recording_state', function(data) {
+    updateRecordingState(data.isRecording, data.elapsedTime);
 });

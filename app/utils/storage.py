@@ -44,4 +44,4 @@ def create_blank_jpg(image_path):
     return image_path
 
 def get_image_path(filename):
-    return os.path.join("/home/pi/Repos/avt/recordings", filename)
+    return os.path.join("/home/pi/Repos/avt/", filename)

@@ -1,15 +1,19 @@
 import utils 
 from flask_socketio import emit
+import time
+
 
 def handle_toggle_recording(data, pipeline):
     is_recording = data['isRecording']
     record_folder = data['folderName']
-    print(f"Recording state: {is_recording}, Folder: {record_folder}")
-
-    # Emit the current recording state and folder name to the client
-    emit('recording_state_updated', {'isRecording': is_recording, 'folderName': record_folder}, broadcast=True)
-
     return is_recording, record_folder
+
+
+
+
+
+
+
 
 def handle_update_parameters(data, pipeline):
 
@@ -20,12 +24,7 @@ def handle_update_parameters(data, pipeline):
     utils.xml.update_from_json(root, data)
     utils.xml.write(root, '/home/pi/Repos/avt/app/settings/current.xml')
 
-    
-    
-    # Emit the updated parameters back to the client
     emit('parameters_updated', data)
-
-
 
     utils.pipeline.config.restart(pipeline)
 
