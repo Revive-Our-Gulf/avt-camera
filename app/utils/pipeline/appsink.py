@@ -41,7 +41,7 @@ def connect(pipeline):
 
 def save_image(array):
     global image_counter, global_record_path
-    timestamp = datetime.now().isoformat()
+    timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     filename = global_record_path + f"/IMG_{image_counter}({timestamp}).jpg"
     
     rgb_image = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
