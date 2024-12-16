@@ -50,7 +50,7 @@
         "type": "number",
         "label": "Balance Ratio Blue"
     },
-    "Line2+LineSource": {
+    "LineSource+Line2": {
         "entry": "Line2",
         "feature": "LineSource",
         "type": "select",
