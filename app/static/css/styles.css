@@ -32,16 +32,6 @@ img {
     margin-top: 10px;
 }
 
-#restartButton {
-    white-space: nowrap; /* Prevent text overflow */
-    height: 100%;
-    width: auto;
-}
-
-#folderName {
-    width: 100%; /* Ensure the input field takes full width */
-}
-
 #recordingInfo {
     margin-top: 10px;
 }

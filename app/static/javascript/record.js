@@ -17,8 +17,10 @@ function updateRecordingState(recording, elapsedTime) {
 
     if (isRecording) {
         button.classList.add('recording');
+        button.textContent = 'Stop';
     } else {
         button.classList.remove('recording');
+        button.textContent = 'Start';
     }
     console.log("Elapsed time:", elapsedTime);
     updateTimeDisplay(elapsedTime);
@@ -44,7 +46,7 @@ window.onload = function() {
     socket.emit('get_recording_state');
     setInterval(function() {
         socket.emit('get_recording_state');
-    }, 1000); // Request the recording state every second
+    }, 1); // Request the recording state every second
 };
 
 socket.on('current_recording_state', function(data) {

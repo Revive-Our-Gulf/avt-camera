@@ -22,7 +22,7 @@ socketio = SocketIO(app)
 is_recording = False  # Global variable to control recording state
 was_recording = False  # Global variable to track previous recording state
 record_folder = "transect"  # Default folder name
-start_time = None  # Variable to track the start time of the recording
+start_time = 0  # Variable to track the start time of the recording
 
 DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/current.xml name=vimbasrc ! "
                     "video/x-bayer,format=rggb ! bayer2rgb ! videoconvert ! "
