@@ -14,6 +14,14 @@ from handlers import handlers
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GObject  
+import logging
+import subprocess
+import cv2
+import os
+import re
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.WARNING)
 
 
 app = Flask(__name__)
@@ -87,6 +95,56 @@ def emit_recording_state():
     elapsed_time = (time.time() - start_time) if is_recording else 0
     socketio.emit('current_recording_state', {'isRecording': is_recording, 'elapsedTime': elapsed_time})
 
+def convert_jpegs_to_mjpeg(record_folder, fps=25):
+    # Specify the folder containing the images
+    output_video_path = record_folder + "/output.avi"
+    fps = 2  # Frames per second of the video
+    scale_factor = 0.125
+
+    # Regex to match image filenames
+    image_pattern = re.compile(r"IMG_(\d+)\(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\)\.jpg")
+
+    # Get a sorted list of matching image filenames
+    images = [
+        img for img in os.listdir(record_folder)
+        if image_pattern.match(img)
+    ]
+    images.sort(key=lambda x: int(image_pattern.match(x).group(1)))
+
+    # Check if images are found
+    if not images:
+        print("No matching images found in the folder.")
+        exit()
+
+    # Read the first image to get the dimensions
+    first_image_path = os.path.join(record_folder, images[0])
+    first_image = cv2.imread(first_image_path)
+    original_height, original_width, _ = first_image.shape
+
+    new_width = int(original_width * scale_factor)
+    new_height = int(original_height * scale_factor)
+    new_size = (new_width, new_height)
+
+    # Define the codec and create VideoWriter object
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')  # MJPEG codec
+    out = cv2.VideoWriter(output_video_path, fourcc, fps, new_size)
+
+    # Write each image to the video
+    for image_file in images:
+        image_path = os.path.join(record_folder, image_file)
+        frame = cv2.imread(image_path)
+
+        # Resize the frame
+        downscaled_frame = cv2.resize(frame, new_size, interpolation=cv2.INTER_AREA)
+
+        # Write the downscaled frame to the video
+        out.write(downscaled_frame)
+
+    # Release the VideoWriter
+    out.release()
+
+    print(f"Downscaled video saved as {output_video_path}")
+
 def main():
     global is_recording, was_recording, record_folder, start_time
     was_recording = False  # Initialize was_recording
@@ -104,6 +162,7 @@ def main():
             def handle_toggle_recording_wrapper(data):
                 global is_recording, record_folder
                 is_recording, record_folder = handlers.handle_toggle_recording(data, pipeline)
+                    
 
             def handle_restart_pipeline():
                 global is_recording, start_time
@@ -121,13 +180,18 @@ def main():
             image_thread.daemon = True
             image_thread.start()
 
+
+
+            modified_record_folder = None
+
             while True:
                 if not pipeline.is_done:
                     if is_recording and not was_recording:
-                        utils.pipeline.recording.start(pipeline, record_folder)
+                        modified_record_folder = utils.pipeline.recording.start(pipeline, record_folder)
                         start_time = time.time()
                     elif not is_recording and was_recording:
                         utils.pipeline.recording.stop(pipeline)
+                        convert_jpegs_to_mjpeg(modified_record_folder, fps=2)
                         start_time = 0
                     
                     was_recording = is_recording
