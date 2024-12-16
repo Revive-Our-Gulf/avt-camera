@@ -56,15 +56,15 @@ def on_buffer(sink: GstApp.AppSink, data: typ.Any) -> Gst.FlowReturn:
 
     if isinstance(sample, Gst.Sample):
         array = extract_buffer(sample)
-        print(
-            "Received {type} with shape {shape} of type {dtype}".format(type=type(array),
-                                                                        shape=array.shape,
-                                                                        dtype=array.dtype))
+        # print(
+        #     "Received {type} with shape {shape} of type {dtype}".format(type=type(array),
+        #                                                                 shape=array.shape,
+        #                                                                 dtype=array.dtype))
         
         try:
             if (save_images):
                 save_image(array)
-            print("Image saved")
+                print("Image saved")
         except Exception as e:
             print(f"Error saving image: {e}")
 
