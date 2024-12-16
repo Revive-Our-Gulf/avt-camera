@@ -6,7 +6,7 @@ from .valve import update_valve
 from . import appsink
 
 def save_parameters(record_path):
-    parameters_file = '/home/pi/Repos/avt/app/settings/current.xml'
+    parameters_file = '/home/pi/Repos/avt-camera/app/settings/current.xml'
     parameters_destination = record_path + '/current.xml'
     print(parameters_file)
     print(parameters_destination)

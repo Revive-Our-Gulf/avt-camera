@@ -6,7 +6,7 @@ from PIL import Image
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def create_recording_folder(base_folder_name):
-    base_path = os.path.join("/home/pi/Repos/avt/recordings", base_folder_name)
+    base_path = os.path.join("/home/pi/Repos/avt-camera/recordings", base_folder_name)
     folder_path = base_path + "_1"
     counter = 1
 
@@ -44,4 +44,4 @@ def create_blank_jpg(image_path):
     return image_path
 
 def get_image_path(filename):
-    return os.path.join("/home/pi/Repos/avt/", filename)
+    return os.path.join("/home/pi/Repos/avt-camera/", filename)

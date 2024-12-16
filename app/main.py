@@ -31,7 +31,7 @@ DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/curr
                     "t. ! queue ! "
                     "videoscale ! capsfilter name=capsfilter_stream caps=video/x-raw,width=1028,height=752 ! "
                     "jpegenc ! "
-                    "multifilesink name=filesink_stream location=/home/pi/Repos/avt/stream.jpg "
+                    "multifilesink name=filesink_stream location=/home/pi/Repos/avt-camera/stream.jpg "
 
                     "t. ! queue ! "
                     "videoconvert ! "
@@ -56,7 +56,7 @@ def stream():
 
 @app.route('/last_frame')
 def last_frame():
-    return send_file('/home/pi/Repos/avt/recordings/stream.jpg', mimetype='image/jpeg')
+    return send_file('/home/pi/Repos/avt-camera/recordings/stream.jpg', mimetype='image/jpeg')
 
 @app.route('/parameters')
 def parameters():
@@ -73,7 +73,7 @@ def emit_images():
     last_image_data = None
 
     while True:
-        with open('/home/pi/Repos/avt/stream.jpg', 'rb') as image_file:
+        with open('/home/pi/Repos/avt-camera/stream.jpg', 'rb') as image_file:
             image_data = image_file.read()
             if image_data != last_image_data:
                 encoded_image = base64.b64encode(image_data).decode('utf-8')
