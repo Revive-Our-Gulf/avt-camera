@@ -27,6 +27,9 @@ function updateRecordingState(recording, elapsedTime) {
 }
 
 function updateTimeDisplay(elapsedTime) {
+    if (elapsedTime > 86400){
+        elapsedTime = 0;
+    }
     var timeRecording = document.getElementById('timeRecording');
     if (isRecording) {
         var minutes = Math.floor(elapsedTime / 60);

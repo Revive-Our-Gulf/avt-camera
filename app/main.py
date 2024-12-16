@@ -60,8 +60,8 @@ def last_frame():
 
 @app.route('/parameters')
 def parameters():
-    parameters = utils.json.get_parameters('settings/parameters.json')
-    values = utils.xml.get_values_from_xml('settings/current.xml', parameters)
+    parameters = utils.json.get_parameters('/home/pi/Repos/avt-camera/app/settings/parameters.json')
+    values = utils.xml.get_values_from_xml('/home/pi/Repos/avt-camera/app/settings/current.xml', parameters)
     
     print(f" Parameters: {parameters}")
     print(f" Values : {values}")
@@ -128,7 +128,7 @@ def main():
                         start_time = time.time()
                     elif not is_recording and was_recording:
                         utils.pipeline.recording.stop(pipeline)
-                        start_time = None
+                        start_time = 0
                     
                     was_recording = is_recording
                 time.sleep(.25)
