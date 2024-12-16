@@ -17,5 +17,6 @@ __pycache__/
 .DS_Store
 *.tiff
 *.jpeg
+*.jpg
 *.png
 *.diff
