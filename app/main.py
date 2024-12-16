@@ -24,7 +24,7 @@ was_recording = False  # Global variable to track previous recording state
 record_folder = "transect"  # Default folder name
 start_time = 0  # Variable to track the start time of the recording
 
-DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/current.xml name=vimbasrc ! "
+DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=/home/pi/Repos/avt-camera/app/settings/current.xml name=vimbasrc ! "
                     "video/x-bayer,format=rggb ! bayer2rgb ! videoconvert ! "
                     "tee name=t "
 

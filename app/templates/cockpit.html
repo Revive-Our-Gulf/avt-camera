@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}RTSP Server{% endblock %}</title>
-    <link href="{{ url_for('static', filename='bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='bootstrap/bootstrap-dark.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="{{ url_for('static', filename='bootstrap/jquery-slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/popper.min.js') }}"></script>
@@ -19,11 +19,15 @@
         }
     </script>
     <style>
+        body {
+            background: rgb(15,15,15);
+            color: white;
+        }
         .icon{
             background-size: cover;
             display: inline-block;
-            height: 20px;
-            width: 20px;
+            height: 15px;
+            width: 15px;
             filter: invert(100%);
         }
 
@@ -49,16 +53,13 @@
 <body>
     <div class="container">
         <div class="d-flex flex-nowrap align-items-center mb-3" role="toolbar" aria-label="Toolbar with button groups">
-            <input type="text" id="folderName" class="form-control mr-2" placeholder="Transect Name">
-
-            <div class="btn-group mr-2">
+            <div class="input-group mr-3">
+                <input type="text" id="folderName" class="form-control mr-2" placeholder="Transect Name">
                 <button type="button" class="btn btn-record" id="recordButton" onclick="toggleRecording()">Start</button>
-                <div class="input-group-prepend">
-                    <div class="input-group-text time-recording" id="timeRecording">0:00</div>
-                </div>
+                <span class="input-group-text time-recording" id="timeRecording">0:00</span>
             </div>
 
-            <div class="btn-group">
+            <div class="btn-group mr-3">
                 <button id="restartButton" class="btn btn-secondary" onclick="restartPipeline()">
                     <i class="icon icon-restart"></i>
                 </button>
