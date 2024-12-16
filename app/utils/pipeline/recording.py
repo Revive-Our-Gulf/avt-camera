@@ -16,12 +16,9 @@ def save_parameters(record_path):
 def start(pipeline, record_folder):
     record_path = storage.create_recording_folder(record_folder)
     save_parameters(record_path)
-
-    # update_valve(pipeline, enable=False)
-    appsink.start(pipeline, record_path)
+    appsink.start(record_path)
 
     return record_path
 
 def stop(pipeline):
-    # update_valve(pipeline, enable=True)
-    appsink.stop(pipeline)
+    appsink.stop()

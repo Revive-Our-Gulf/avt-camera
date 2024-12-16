@@ -6,11 +6,12 @@ from . import appsink
 
 
 def setup(pipeline):
-    # filesink_record = pipeline.get_by_name("filesink_record")
-    # filesink_record.set_state(Gst.State.NULL)
+    appsink.connect(pipeline)
+    appsink.stop()
 
-    update_valve(pipeline, enable=True)
-    appsink.stop(pipeline)
+    pipeline.get_by_name("filesink_stream").set_state(Gst.State.NULL)
+    pipeline.get_by_name("filesink_stream").set_state(Gst.State.PLAYING)
+    
 
 
 def restart(pipeline):

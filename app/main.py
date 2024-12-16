@@ -7,24 +7,12 @@ from flask_socketio import SocketIO
 from vmbpy import *
 
 from gstreamer import GstContext, GstPipeline, GstApp, Gst, GstVideo, GstPipeline
-import gstreamer.utils as gst_utils
 import utils
 from handlers import handlers
-
-import cProfile
-import pstats
-import io
-
-import shutil
 
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GObject  
-import numpy as np
-
-import typing as typ
-
-import cv2
 
 
 app = Flask(__name__)
@@ -36,22 +24,17 @@ record_folder = "transect"  # Default folder name
 
 DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=settings/current.xml name=vimbasrc ! "
                     "video/x-bayer,format=rggb ! bayer2rgb ! videoconvert ! "
-                    # "video/x-raw,format=RGB ! "
                     "tee name=t "
 
                     "t. ! queue ! "
                     "videoscale ! capsfilter name=capsfilter_stream caps=video/x-raw,width=1028,height=752 ! "
                     "jpegenc ! "
-                    # "fakesink "
                     "multifilesink name=filesink_stream location=/home/pi/Repos/avt/stream.jpg "
 
                     "t. ! queue ! "
-                    # "valve name=record_valve drop=false ! "
-                    # "jpegenc ! "
-                    # "multifilesink name=filesink_record location=/home/pi/Repos/avt/recordings/stream.jpg post-messages=true")
                     "videoconvert ! "
                     "video/x-raw,format=RGB ! "
-                    "appsink name=appsink_record emit-signals=false")
+                    "appsink name=appsink_record emit-signals=true")
 
 
 
@@ -109,7 +92,7 @@ def main():
     try:
         with GstContext(), GstPipeline(DEFAULT_PIPELINE) as pipeline:         
             
-            # utils.pipeline.setup_pipeline(pipeline)
+            utils.pipeline.config.setup(pipeline)
 
             def handle_toggle_recording_wrapper(data):
                 global is_recording, record_folder
@@ -123,9 +106,6 @@ def main():
             image_thread = threading.Thread(target=emit_images)
             image_thread.daemon = True
             image_thread.start()
-
-            pipeline.get_by_name("filesink_stream").set_state(Gst.State.NULL)
-            pipeline.get_by_name("filesink_stream").set_state(Gst.State.PLAYING)
 
             while True:
                 if not pipeline.is_done:
@@ -142,22 +122,7 @@ def main():
 
 
 if __name__ == "__main__":
-    pr = cProfile.Profile()
-    pr.enable()
-
-    try:
-        thread = threading.Thread(target=lambda: socketio.run(app, host='192.168.2.3', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True))
-        thread.daemon = True
-        thread.start()
-        main()
-    except KeyboardInterrupt:
-        print("Interrupted by user")
-    finally:
-        pr.disable()
-        s = io.StringIO()
-        sortby = 'cumulative'
-        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-        ps.print_stats()
-        with open('/home/pi/Repos/avt/profile_output.txt', 'w') as f:
-            f.write(s.getvalue())
-        print("Profile data saved to /home/pi/Repos/avt/profile_output.txt")
+    thread = threading.Thread(target=lambda: socketio.run(app, host='192.168.2.3', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True))
+    thread.daemon = True
+    thread.start()
+    main()

@@ -21,17 +21,20 @@ from datetime import datetime
 image_counter = 0
 global_record_path = None
 
-def stop(pipeline):
-    appsink = pipeline.get_by_name("appsink_record")
-    appsink.set_property("emit_signals", False)
+save_images = False
 
-def start(pipeline, record_path):
-    global image_counter, global_record_path
+def stop():
+    global save_images
+    save_images = False
+
+def start(record_path):
+    global image_counter, global_record_path, save_images
     global_record_path = record_path
     image_counter = 0
+    save_images = True
+    
+def connect(pipeline):
     appsink = pipeline.get_by_name("appsink_record")
-    appsink.set_property("emit_signals", True)
-
     appsink.connect("new-sample", on_buffer, None)
 
 
@@ -59,7 +62,8 @@ def on_buffer(sink: GstApp.AppSink, data: typ.Any) -> Gst.FlowReturn:
                                                                         dtype=array.dtype))
         
         try:
-            save_image(array)
+            if (save_images):
+                save_image(array)
             print("Image saved")
         except Exception as e:
             print(f"Error saving image: {e}")
