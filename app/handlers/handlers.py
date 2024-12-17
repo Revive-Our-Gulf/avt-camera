@@ -3,14 +3,10 @@ from flask_socketio import emit
 import time
 
 
-def handle_toggle_recording(data, pipeline):
+def handle_toggle_recording(data):
     is_recording = data['isRecording']
     record_folder = data['folderName']
     return is_recording, record_folder
-
-
-
-
 
 
 

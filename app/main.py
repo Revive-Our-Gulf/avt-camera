@@ -20,6 +20,8 @@ import cv2
 import os
 import re
 
+from flask import Flask, request, jsonify
+
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.WARNING)
 
@@ -75,6 +77,13 @@ def parameters():
     print(f" Values : {values}")
 
     return render_template('parameters.html', parameters=parameters, values=values)
+
+@app.route('/toggle_recording', methods=['POST'])
+def toggle_recording():
+    data = request.json
+    handle_toggle_recording_wrapper(data)
+    return jsonify({'status': 'recording toggled', 'isRecording': data['isRecording'], 'folderName': data['folderName']})
+
 
 def emit_images():
     global is_recording, was_recording
@@ -145,6 +154,12 @@ def convert_jpegs_to_mjpeg(record_folder, fps=25):
 
     print(f"Downscaled video saved as {output_video_path}")
 
+def handle_toggle_recording_wrapper(data):
+    global is_recording, record_folder
+    is_recording, record_folder = handlers.handle_toggle_recording(data)
+                    
+
+
 def main():
     global is_recording, was_recording, record_folder, start_time
     was_recording = False  # Initialize was_recording
@@ -159,10 +174,7 @@ def main():
             
             utils.pipeline.config.setup(pipeline)
 
-            def handle_toggle_recording_wrapper(data):
-                global is_recording, record_folder
-                is_recording, record_folder = handlers.handle_toggle_recording(data, pipeline)
-                    
+            
 
             def handle_restart_pipeline():
                 global is_recording, start_time
