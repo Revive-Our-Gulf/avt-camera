@@ -111,7 +111,7 @@ def convert_jpegs_to_mjpeg(record_folder, fps=25):
     scale_factor = 0.125
 
     # Regex to match image filenames
-    image_pattern = re.compile(r"IMG_(\d+)\(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\)\.jpg")
+    image_pattern = re.compile(r"IMG_(\d+)_\(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\)\.jpg")
 
     # Get a sorted list of matching image filenames
     images = [

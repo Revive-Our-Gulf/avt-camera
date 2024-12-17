@@ -49,9 +49,10 @@ window.onload = function() {
     socket.emit('get_recording_state');
     setInterval(function() {
         socket.emit('get_recording_state');
-    }, 1); // Request the recording state every second
+    }, 1000);
 };
 
 socket.on('current_recording_state', function(data) {
+    console.log("Received current_recording_state:", data);
     updateRecordingState(data.isRecording, data.elapsedTime);
 });

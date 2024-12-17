@@ -1,24 +1,21 @@
 import os
 import logging
 from PIL import Image
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def create_recording_folder(base_folder_name):
-    base_path = os.path.join("/home/pi/Repos/avt-camera/recordings", base_folder_name)
-    folder_path = base_path + "_1"
-    counter = 1
 
-    logging.info(f"Creating recording folder with base path: {base_path}")
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    sanitised_base_folder_name = base_folder_name.replace(" ", "_")
 
-    # Check if the folder exists and if it's not empty, increment the name
-    while os.path.exists(folder_path) and os.listdir(folder_path):
-        logging.info(f"Folder {folder_path} already exists and is not empty. Incrementing counter.")
-        counter += 1
-        folder_path = f"{base_path}_{counter}"
+    folder_name = f"{current_time}_{sanitised_base_folder_name}"
+    folder_path = os.path.join("/home/pi/Repos/avt-camera/recordings", folder_name)
 
-    # Create the folder
+    logging.info(f"Creating recording folder with path: {folder_path}")
+
     os.makedirs(folder_path, exist_ok=True)
     logging.info(f"Folder created at path: {folder_path}")
     return folder_path

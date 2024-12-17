@@ -19,16 +19,28 @@
         }
     </script>
     <style>
-        body {
-            background: rgb(15,15,15);
-            color: white;
-        }
-        .icon{
+        .icon {
             background-size: cover;
             display: inline-block;
             height: 15px;
             width: 15px;
             filter: invert(100%);
+        }
+
+        .stream-container {
+            flex: 1;
+            background: black;
+            display: flex;
+            justify-content: center;  /* Centers the image horizontally */
+            align-items: center;      /* Centers the image vertically */
+            overflow: hidden;         /* Ensures no overflow of the image */
+        }
+
+        .stream-container img {
+            width: 100%;              /* Ensures the image takes the full width of the container */
+            height: auto;             /* Maintains the aspect ratio of the image */
+            max-height: 100%;         /* Ensures the image does not exceed the height of the container */
+            object-fit: contain;      /* Ensures the image is contained without distortion */
         }
 
         .icon-restart{
@@ -51,28 +63,26 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="d-flex flex-nowrap align-items-center mb-3" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="input-group mr-3">
-                <input type="text" id="folderName" class="form-control mr-2" placeholder="Transect Name">
-                <button type="button" class="btn btn-record" id="recordButton" onclick="toggleRecording()">Start</button>
-                <span class="input-group-text time-recording" id="timeRecording">0:00</span>
-            </div>
-
-            <div class="btn-group mr-3">
-                <button id="restartButton" class="btn btn-secondary" onclick="restartPipeline()">
-                    <i class="icon icon-restart"></i>
-                </button>
-                <button id="parametersButton" class="btn btn-secondary" onclick="window.open('/parameters', '_blank')">
-                    <i class="icon icon-parameters"></i>
-                </button>
-            </div>
+    <div class="d-flex" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="input-group mr-3">
+            <input type="text" id="folderName" class="form-control mr-2" placeholder="Transect Name">
+            <button type="button" class="btn btn-record" id="recordButton" onclick="toggleRecording()">Start</button>
+            <span class="input-group-text time-recording" id="timeRecording">0:00</span>
         </div>
-        <div class="row">
-            <div class="col-12 text-center">
-                <img id="live_feed" src="" alt="Live Feed" class="img-fluid mb-2"/>
-            </div>
+
+        <div class="btn-group mr-3">
+            <button id="restartButton" class="btn btn-secondary" onclick="restartPipeline()">
+                <i class="icon icon-restart"></i>
+            </button>
+            <button id="parametersButton" class="btn btn-secondary" onclick="window.open('/parameters', '_blank')">
+                <i class="icon icon-parameters"></i>
+            </button>
         </div>
     </div>
+    <div class="stream-container">
+        <img id="live_feed" src="" alt="Live Feed" class="stream"/>
+    </div>
+    
+    
 </body>
 </html>
