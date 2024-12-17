@@ -46,7 +46,7 @@ def save_image(array):
     
     rgb_image = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
     
-    cv2.imwrite(filename, rgb_image)
+    cv2.imwrite(filename, rgb_image, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
     image_counter += 1
 
 
