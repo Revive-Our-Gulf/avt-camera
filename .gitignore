@@ -2,6 +2,7 @@
 recordings/
 recordings/*.jpg
 experiments/
+stream.jpg
 
 # Ignore everything in the packages directory
 packages/

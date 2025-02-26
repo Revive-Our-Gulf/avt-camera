@@ -149,7 +149,7 @@
             <SelectorCombination Entry="Line1" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
             <SelectorCombination Entry="Line2" Feature="LineMode" Type="Enumeration">Output</SelectorCombination>
             <SelectorCombination Entry="Line2" Feature="LineInverter" Type="Boolean">False</SelectorCombination>
-            <SelectorCombination Entry="Line2" Feature="LineSource" Type="Enumeration">ExposureActive</SelectorCombination>
+            <SelectorCombination Entry="Line2" Feature="LineSource" Type="Enumeration">Off</SelectorCombination>
             <SelectorCombination Entry="Line3" Feature="LineMode" Type="Enumeration">Input</SelectorCombination>
         </Selector>
         <Selector Name="TimerSelector" Type="Enumeration" SelectedFeatures="6">

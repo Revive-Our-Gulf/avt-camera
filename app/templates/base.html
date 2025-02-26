@@ -4,8 +4,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>{% block title %}RTSP Server{% endblock %}</title>
-        <link href="{{ url_for('static', filename='bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/copy-snackbar.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
         <script src="{{ url_for('static', filename='bootstrap/jquery-slim.min.js') }}"></script>
         <script src="{{ url_for('static', filename='bootstrap/popper.min.js') }}"></script>
         <script src="{{ url_for('static', filename='bootstrap/bootstrap.min.js') }}"></script>
@@ -14,29 +18,10 @@
         <script src="{{ url_for('static', filename='javascript/stream.js') }}"></script>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="#">AVT G1 Camera</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/cockpit">Cockpit</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/stream">Stream</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/parameters">Parameters</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        <div id="content" class="container-fluid text-center">
+        {% if include_navbar %}
+            {% include 'navbar.html' %}
+        {% endif %}
+        <div id="content" class="container-fluid text-center"></div>
             {% block content %}{% endblock %}
         </div>
         {% block extra_scripts %}{% endblock %}

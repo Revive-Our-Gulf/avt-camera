@@ -5,7 +5,7 @@ from gstreamer import Gst
 
 def is_camera_available(camera_name):
     try:
-        result = subprocess.run(['arv-tool-0.10'], capture_output=True, text=True, check=True)
+        result = subprocess.run(['arv-tool-0.8'], capture_output=True, text=True, check=True)
         if camera_name in result.stdout:
             print(camera_name)
             return True
