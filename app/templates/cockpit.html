@@ -3,13 +3,17 @@
 {% block title %}RTSP Server{% endblock %}
 {% block content %}
 <div class="d-flex" role="toolbar" aria-label="Toolbar with button groups">
-    <div class="input-group mr-3">
+    <div class="input-group">
         <input type="text" id="folderName" class="form-control mr-2" placeholder="Transect Name">
-        <button type="button" class="btn btn-record" id="recordButton" onclick="toggleRecording()">Start</button>
+        <span class="input-group-text", id="CurrentTransectName">Transect</span>
+        <button type="button" class="btn btn-primary" id="setNameButton" onclick="setTransectName()">Set Name</button>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-success" id="recordButton" onclick="toggleRecording()">Start</button>
         <span class="input-group-text time-recording" id="timeRecording">0:00</span>
     </div>
 
-    <div class="btn-group mr-3">
+    <div class="btn-group">
         <button id="restartButton" class="btn btn-secondary" onclick="restartPipeline()">
             <i class="fas fa-sync-alt"></i>
         </button>
@@ -24,6 +28,9 @@
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/transect.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/record.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/status.js') }}"></script>
 <script>
     function restartPipeline() {
         socket.emit('restart_pipeline');
