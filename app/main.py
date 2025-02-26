@@ -164,7 +164,7 @@ def main():
     global is_recording, was_recording, record_folder, start_time
     was_recording = False  # Initialize was_recording
 
-    utils.camera.wait_for_camera('DEV_000A4700155E')
+    # utils.camera.wait_for_camera('DEV_000A4700155E')
     utils.network.modify_mtu()
 
     utils.storage.ensure_stream_image_exists()
@@ -203,7 +203,6 @@ def main():
                         start_time = time.time()
                     elif not is_recording and was_recording:
                         utils.pipeline.recording.stop(pipeline)
-                        convert_jpegs_to_mjpeg(modified_record_folder, fps=2)
                         start_time = 0
                     
                     was_recording = is_recording
