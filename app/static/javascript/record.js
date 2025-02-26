@@ -16,10 +16,13 @@ function updateRecordingState(recording, elapsedTime) {
     isRecording = recording; // Update the local isRecording variable
 
     if (isRecording) {
-        button.classList.add('recording');
+        button.classList.add('btn-danger');
+        button.classList.remove('btn-success');
         button.textContent = 'Stop';
     } else {
-        button.classList.remove('recording');
+        button.classList.add('btn-success');
+        button.classList.remove('btn-danger');
+        
         button.textContent = 'Start';
     }
     console.log("Elapsed time:", elapsedTime);
