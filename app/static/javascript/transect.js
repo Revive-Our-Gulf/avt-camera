@@ -23,3 +23,7 @@ function getTransectName() {
 window.onload = function() {
     getTransectName();
 };
+
+window.addEventListener('load', function() {
+    getTransectName();
+});
