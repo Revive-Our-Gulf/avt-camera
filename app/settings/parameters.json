@@ -10,7 +10,8 @@
     },
     "ExposureTime": {
         "type": "number",
-        "label": "Exposure Time"
+        "label": "Exposure Time",
+        "unit": "ms"
     },
     "GainAuto": {
         "type": "select",
@@ -23,11 +24,13 @@
     },
     "Gain": {
         "type": "number",
-        "label": "Gain"
+        "label": "Gain",
+        "unit": "dB"
     },
     "AcquisitionFrameRate": {
         "type": "number",
-        "label": "Acquisition Frame Rate"
+        "label": "Acquisition Frame Rate",
+        "unit": "fps"
     },
     "BalanceWhiteAuto": {
         "type": "select",
@@ -42,13 +45,15 @@
         "entry": "Red",
         "feature": "BalanceRatio",
         "type": "number",
-        "label": "Balance Ratio Red"
+        "label": "Balance Ratio Red",
+        "unit": "ratio"
     },
     "BalanceRatio+Blue": {
         "entry": "Blue",
         "feature": "BalanceRatio",
         "type": "number",
-        "label": "Balance Ratio Blue"
+        "label": "Balance Ratio Blue",
+        "unit": "ratio"
     },
     "LineSource+Line2": {
         "entry": "Line2",
@@ -56,8 +61,7 @@
         "type": "select",
         "options": [
             "Off",
-            "ExposureActive",
-            "FrameTriggerWait"
+            "ExposureActive"
         ],
         "label": "Line 2 Line Source"
     }

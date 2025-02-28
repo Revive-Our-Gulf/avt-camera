@@ -8,35 +8,51 @@
         <h1>Camera Parameters</h1>
         <form id="parametersForm">
             <div class="row font-weight-bold">
-                <div class="col-md-4">Setting</div>
-                <div class="col-md-4">Current Value</div>
-                <div class="col-md-4">New Value</div>
+                <div class="col-md-4"><h5>Setting</h5></div>
+                <div class="col-md-4"><h5>Current Value</h5></div>
+                <div class="col-md-4"><h5>New Value</h5></div>
             </div>
             {% for param_name, param_info in parameters.items() %}
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <label for="{{ param_name }}">{{ param_info.label }}:</label>
+                        <label for="{{ param_name }}">
+                            {{ param_info.label }}
+                            {% if param_info.unit %}
+                                ({{ param_info.unit }})
+                            {% endif %}
+                        </label>
                     </div>
                     <div class="col-md-4">
                         <span id="{{ param_name }}_current_value" class="current-value">{{ values[param_name] }}</span>
                     </div>
                     <div class="col-md-4">
                         {% if param_info.type == 'select' %}
-                            <select id="{{ param_name }}" name="{{ param_name }}" class="form-control">
-                                {% for option in param_info.options %}
-                                    <option value="{{ option }}" {% if option == values[param_name] %}selected{% endif %}>{{ option }}</option>
-                                {% endfor %}
-                            </select>
+                            <div class="input-group">
+                                <select id="{{ param_name }}" name="{{ param_name }}" class="form-control">
+                                    {% for option in param_info.options %}
+                                        <option value="{{ option }}" {% if option == values[param_name] %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         {% else %}
-                            <input type="{{ param_info.type }}" id="{{ param_name }}" name="{{ param_name }}" value="{{ values[param_name] }}" class="form-control" placeholder="Enter {{ param_info.label }}">
+                            <div class="input-group">
+                                <input type="{{ param_info.type }}" id="{{ param_name }}" name="{{ param_name }}" value="{{ values[param_name] }}" class="form-control" placeholder="Enter {{ param_info.label }}">
+                            </div>
                         {% endif %}
                     </div>
                 </div>
             {% endfor %}
             <div class="row">
                 <div class="col-md-12 text-right">
-                    <button type="button" class="btn btn-primary" onclick="updateParameters()">Update</button>
-                    <button type="button" class="btn btn-secondary" onclick="resetParameters()">Reset</button>
+                    <button type="button" class="btn btn-primary" onclick="updateParameters()">
+                        <i class="fa fa-save"></i> Apply Settings
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetParameters()">
+                        <i class="fa fa-undo"></i> Default Settings
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="restartPipeline()">
+                        <i class="fa fa-power-off"></i> Restart Camera
+                    </button>
                 </div>
             </div>
         </form>

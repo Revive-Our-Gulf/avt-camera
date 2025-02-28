@@ -31,7 +31,8 @@ socketio = SocketIO(app)
 
 is_recording = False  # Global variable to control recording state
 was_recording = False  # Global variable to track previous recording state
-record_folder = "transect"  # Default folder name
+record_folder = None # Default folder name
+transect_name = "transect"
 start_time = 0  # Variable to track the start time of the recording
 
 DEFAULT_PIPELINE = ("vimbasrc camera=DEV_000A4700155E settingsfile=/home/pi/Repos/avt-camera/app/settings/current.xml name=vimbasrc ! "
@@ -78,12 +79,49 @@ def parameters():
 
     return render_template('parameters.html', parameters=parameters, values=values)
 
-@app.route('/toggle_recording', methods=['POST'])
-def toggle_recording():
-    data = request.json
-    handle_toggle_recording_wrapper(data)
-    return jsonify({'status': 'recording toggled', 'isRecording': data['isRecording'], 'folderName': data['folderName']})
+@app.route('/set_transect_name', methods=['POST'])
+def set_transect_name():
+    global transect_name
+    data = request.get_json()
+    if data and 'transect_name' in data:
+        transect_name = data['transect_name'].strip() or 'transect'
+    return jsonify(status="success")
 
+@app.route('/get_transect_name')
+def get_transect_name():
+    global transect_name
+    return jsonify(transect_name=transect_name)
+
+
+@socketio.on('toggle_recording')
+def handle_toggle_recording_wrapper(data=None):
+    global is_recording, record_folder, start_time
+
+    is_recording = not is_recording
+
+    if is_recording:
+        start_time = time.time()
+        print(f"Recording started in folder {record_folder}")
+    else:
+        start_time = 0
+        print("Recording stopped.")
+
+    # Emit the updated state to all clients
+    elapsed_time = (time.time() - start_time) if is_recording else 0
+    socketio.emit('current_recording_state', {'isRecording': is_recording, 'elapsedTime': elapsed_time})
+
+@socketio.on('get_recording_state')
+def handle_get_recording_state(data=None):
+    global start_time, is_recording
+    elapsed_time = (time.time() - start_time) if is_recording else 0
+    socketio.emit('current_recording_state', {'isRecording': is_recording, 'elapsedTime': elapsed_time})
+
+@socketio.on('get_strobe_state')
+def handle_get_strobe_state():
+    parameters = utils.json.get_parameters('/home/pi/Repos/avt-camera/app/settings/parameters.json')
+    values = utils.xml.get_values_from_xml('/home/pi/Repos/avt-camera/app/settings/current.xml', parameters)
+    current_value = values.get('LineSource+Line2', 'Off')
+    socketio.emit('strobe_state', {'value': current_value})
 
 def emit_images():
     global is_recording, was_recording
@@ -97,12 +135,6 @@ def emit_images():
                 socketio.emit('image_update', {'image': encoded_image})
                 last_image_data = image_data
         time.sleep(0.1)  # Emit images at 10 frames per second (100 ms delay)
-
-@socketio.on('get_recording_state')
-def emit_recording_state():
-    global start_time, is_recording
-    elapsed_time = (time.time() - start_time) if is_recording else 0
-    socketio.emit('current_recording_state', {'isRecording': is_recording, 'elapsedTime': elapsed_time})
 
 def convert_jpegs_to_mjpeg(record_folder, fps=25):
     # Specify the folder containing the images
@@ -152,12 +184,7 @@ def convert_jpegs_to_mjpeg(record_folder, fps=25):
     # Release the VideoWriter
     out.release()
 
-    print(f"Downscaled video saved as {output_video_path}")
-
-def handle_toggle_recording_wrapper(data):
-    global is_recording, record_folder
-    is_recording, record_folder = handlers.handle_toggle_recording(data)
-                    
+    print(f"Downscaled video saved as {output_video_path}")         
 
 
 def main():
@@ -199,7 +226,7 @@ def main():
             while True:
                 if not pipeline.is_done:
                     if is_recording and not was_recording:
-                        modified_record_folder = utils.pipeline.recording.start(pipeline, record_folder)
+                        modified_record_folder = utils.pipeline.recording.start(pipeline, transect_name)
                         start_time = time.time()
                     elif not is_recording and was_recording:
                         utils.pipeline.recording.stop(pipeline)

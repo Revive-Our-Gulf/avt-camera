@@ -1,4 +1,3 @@
-// static/script.js
 var socket = io();
 var isRecording = false;
 var recordingStartTime = null;

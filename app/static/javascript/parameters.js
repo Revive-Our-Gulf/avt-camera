@@ -44,3 +44,21 @@ socket.on('parameters_reset', function(message) {
     alert(message.message);
     location.reload();
 });
+
+function restartPipeline() {
+    socket.emit('restart_pipeline');
+}
+
+function toggleStrobe() {
+    socket.emit('get_strobe_state');
+}
+
+socket.on('strobe_state', function(data) {
+    const newValue = data.value === 'Off' ? 'ExposureActive' : 'Off';
+    
+    const updateData = {
+        'LineSource+Line2': newValue
+    };
+    
+    socket.emit('update_parameters', updateData);
+});
