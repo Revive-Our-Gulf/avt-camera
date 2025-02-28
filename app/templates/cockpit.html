@@ -3,23 +3,38 @@
 {% block title %}RTSP Server{% endblock %}
 {% block content %}
 
-<div class="d-flex" role="toolbar" aria-label="Toolbar with button groups">
+<div class="btn-toolbar toolbar-filled justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
     <div class="input-group">
-        <button type="button" class="btn btn-primary" id="setNameButton" onclick="setTransectName()">
-            <i class="fa fa-save"></i>
+        <button type="button" class="btn btn-dark" id="transectNameButton" onclick="openTransectNameOverlay()">
+            <i class="fa fa-pen-to-square"></i> <span id="currentTransectName">Transect Name</span>
         </button>
-        <input type="text" id="folderName" class="form-control mr-2" placeholder="Transect Name">
-        <button type="button" class="btn btn-success" id="recordButton" onclick="toggleRecording()">Start</button>
     </div>
     
-    
+    <!-- Full-screen overlay for transect name input -->
+    <div id="transectNameOverlay" class="overlay">
+        <div class="overlay-content">
+            <h2>Enter Transect Name</h2>
+            <div class="input-group mb-3">
+                <input type="text" id="folderName" class="form-control" placeholder="Transect Name">
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="setTransectName()">Save</button>
+                <button class="btn btn-secondary" onclick="closeTransectNameOverlay()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div class="btn-group">
-        <button id="strobeSwitch" class="btn btn-secondary" onclick="toggleStrobe()">
+        <button type="button" class="btn btn-success" id="recordButton" onclick="toggleRecording()">
+            <i class="fas fa-play"></i>
+        </button>
+
+        <button id="strobeSwitch" class="btn btn-dark" onclick="toggleStrobe()">
             <i class="fas fa-lightbulb"></i>
         </button>
         
         
-        <button id="parametersButton" class="btn btn-secondary" onclick="window.open('/parameters', '_blank')">
+        <button id="parametersButton" class="btn btn-dark" onclick="window.open('/parameters', '_blank')">
             <i class="fas fa-cogs"></i>
         </button>
     </div>

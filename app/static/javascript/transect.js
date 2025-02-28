@@ -17,9 +17,39 @@ function getTransectName() {
         .then(data => {
             currentTransectName = data.transect_name;
             const folderNameInput = document.getElementById('folderName');
-            folderNameInput.value = currentTransectName;
-            updateInputStyle();
+            if (folderNameInput) {
+                folderNameInput.value = currentTransectName;
+            }
+            
+            // Update the button text
+            const transectNameSpan = document.getElementById('currentTransectName');
+            if (transectNameSpan) {
+                transectNameSpan.textContent = currentTransectName;
+            }
         });
+}
+
+function openTransectNameOverlay() {
+    const overlay = document.getElementById('transectNameOverlay');
+    overlay.style.display = 'flex';
+    
+    // Focus the input after a short delay to ensure overlay is visible
+    setTimeout(() => {
+        const input = document.getElementById('folderName');
+        input.focus();
+        input.select();
+    }, 100);
+}
+
+function closeTransectNameOverlay() {
+    const overlay = document.getElementById('transectNameOverlay');
+    overlay.style.display = 'none';
+    
+    // Reset the input to the current name
+    const folderNameInput = document.getElementById('folderName');
+    if (folderNameInput) {
+        folderNameInput.value = currentTransectName;
+    }
 }
 
 function setTransectName() {
@@ -28,38 +58,34 @@ function setTransectName() {
     if (transectName) {
         saveTransectName(transectName);
         currentTransectName = transectName;
-        updateInputStyle();
-        alert(`Transect name saved as: ${transectName}`);
+        
+        // Update the button text
+        const transectNameSpan = document.getElementById('currentTransectName');
+        if (transectNameSpan) {
+            transectNameSpan.textContent = transectName;
+        }
+        
+        // Close the overlay
+        closeTransectNameOverlay();
     } else {
         alert('Please enter a transect name.');
     }
 }
 
-function updateInputStyle() {
-    const folderNameInput = document.getElementById('folderName');
-    const saveButton = document.getElementById('setNameButton');
-    // If the current input doesn't match the saved transect name and is not empty, enable & show blue save button.
-    if (folderNameInput.value.trim() !== currentTransectName.trim() && folderNameInput.value.trim() !== '') {
-        saveButton.classList.remove('btn-secondary');
-        saveButton.classList.add('btn-primary');
-        saveButton.disabled = false;
-    } else {
-        // Otherwise, disable save button and show it as grey.
-        saveButton.classList.remove('btn-primary');
-        saveButton.classList.add('btn-secondary');
-        saveButton.disabled = true;
-    }
-}
-
 // Listen for Enter key to trigger save
-document.getElementById('folderName').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        setTransectName();
+document.addEventListener('DOMContentLoaded', function() {
+    const folderNameInput = document.getElementById('folderName');
+    if (folderNameInput) {
+        folderNameInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                setTransectName();
+            }
+            if (event.key === 'Escape') {
+                closeTransectNameOverlay();
+            }
+        });
     }
+    
+    // Load the current transect name when the page loads
+    getTransectName();
 });
-
-// Listen for any input change to update the styling
-document.getElementById('folderName').addEventListener('input', updateInputStyle);
-
-// Load the current transect name when the page loads
-window.addEventListener('load', getTransectName);
