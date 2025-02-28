@@ -2,6 +2,11 @@
 var socket = io();
 
 function updateParameters() {
+    if (!validateForm()) {
+        return false;
+    }
+
+
     var form = document.getElementById('parametersForm');
     var formData = new FormData(form);
     var data = {};
@@ -62,3 +67,34 @@ socket.on('strobe_state', function(data) {
     
     socket.emit('update_parameters', updateData);
 });
+
+function validateForm() {
+    let isValid = true;
+    const inputs = document.querySelectorAll('#parametersForm input[type="number"]');
+    
+    inputs.forEach(input => {
+        const value = parseFloat(input.value);
+        const min = input.hasAttribute('min') ? parseFloat(input.getAttribute('min')) : null;
+        const max = input.hasAttribute('max') ? parseFloat(input.getAttribute('max')) : null;
+        
+        // Reset previous error styling
+        input.classList.remove('is-invalid');
+        
+        // Check if value is outside bounds
+        if ((min !== null && value < min) || (max !== null && value > max)) {
+            input.classList.add('is-invalid');
+            isValid = false;
+            
+            // Create or update error message
+            let errorMsg = input.nextElementSibling;
+            if (!errorMsg || !errorMsg.classList.contains('invalid-feedback')) {
+                errorMsg = document.createElement('div');
+                errorMsg.className = 'invalid-feedback';
+                input.parentNode.appendChild(errorMsg);
+            }
+            errorMsg.textContent = `Value must be between ${min || '-∞'} and ${max || '∞'}`;
+        }
+    });
+    
+    return isValid;
+}

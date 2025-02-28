@@ -36,7 +36,15 @@
                             </div>
                         {% else %}
                             <div class="input-group">
-                                <input type="{{ param_info.type }}" id="{{ param_name }}" name="{{ param_name }}" value="{{ values[param_name] }}" class="form-control" placeholder="Enter {{ param_info.label }}">
+                                <input type="{{ param_info.type }}" 
+                                    id="{{ param_name }}" 
+                                    name="{{ param_name }}" 
+                                    value="{{ values[param_name] }}" 
+                                    class="form-control" 
+                                    placeholder="Enter {{ param_info.label }}"
+                                    {% if param_info.min is defined %}min="{{ param_info.min }}"{% endif %}
+                                    {% if param_info.max is defined %}max="{{ param_info.max }}"{% endif %}
+                                    >
                             </div>
                         {% endif %}
                     </div>
