@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% set include_navbar = true %}
+
+{% block title %}Home - RTSP Server{% endblock %}
+
+{% block content %}
+<iframe src="http://192.168.2.3:8080" style="width: 100%; height: 100vh; border: none;"></iframe>
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}

@@ -5,6 +5,10 @@
 
 {% block content %}
     <div class="container mt-4">
+        <h1>Storage Information</h1>
+        <div class="progress mb-4">
+            <div id="storage-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+        </div>
         <h1>Camera Parameters</h1>
         <form id="parametersForm">
             <div class="row font-weight-bold">
@@ -13,7 +17,7 @@
                 <div class="col-md-4"><h5>New Value</h5></div>
             </div>
             {% for param_name, param_info in parameters.items() %}
-                <div class="row mb-3">
+                <div class="row mb-1">
                     <div class="col-md-4">
                         <label for="{{ param_name }}">
                             {{ param_info.label }}
@@ -70,4 +74,5 @@
 {% block extra_scripts %}
     <script src="{{ url_for('static', filename='javascript/socket.io.js') }}"></script>
     <script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascript/storage.js') }}"></script>
 {% endblock %}

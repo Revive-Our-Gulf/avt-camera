@@ -20,6 +20,8 @@ import cv2
 import os
 import re
 
+import psutil
+
 from flask import Flask, request, jsonify
 
 log = logging.getLogger('werkzeug')
@@ -79,6 +81,11 @@ def parameters():
 
     return render_template('parameters.html', parameters=parameters, values=values)
 
+@app.route('/files')
+def files():
+    return render_template('filebrowser.html')
+
+
 @app.route('/set_transect_name', methods=['POST'])
 def set_transect_name():
     global transect_name
@@ -123,6 +130,16 @@ def handle_get_strobe_state():
     current_value = values.get('LineSource+Line2', 'Off')
     socketio.emit('strobe_state', {'value': current_value})
 
+@socketio.on('get_storage')
+def emit_storage_info():
+    disk_usage = psutil.disk_usage('/')
+    free_space_gb = disk_usage.free / (1024 * 1024 * 1024)
+    total_space_gb = disk_usage.total / (1024 * 1024 * 1024)
+    socketio.emit('storage_info', {
+        'free_space_gb': free_space_gb,
+        'total_space_gb': total_space_gb
+    })
+    
 def emit_images():
     global is_recording, was_recording
     last_image_data = None
