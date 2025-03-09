@@ -11,7 +11,7 @@
     "ExposureTime": {
         "type": "number",
         "label": "Exposure Time",
-        "unit": "ms",
+        "unit": "μs",
         "min": 300,
         "max": 100000
     },
@@ -73,6 +73,6 @@
             "Off",
             "ExposureActive"
         ],
-        "label": "Line 2 Line Source"
+        "label": "Strobe"
     }
 }
