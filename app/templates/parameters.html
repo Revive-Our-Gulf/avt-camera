@@ -5,74 +5,87 @@
 
 {% block content %}
     <div class="container mt-4">
-        <h1>Storage Information</h1>
-        <div class="progress mb-4">
-            <div id="storage-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+        <div class="card border-0 custom-shadow mt-4" style="background-color: #f5f7fa;">
+            <div class="card-body">
+                <h1>Device Information</h1>
+                <div id="timeSyncStatus"></div>
+            </div>
         </div>
-        <h1>Camera Parameters</h1>
-        <form id="parametersForm">
-            <div class="row font-weight-bold">
-                <div class="col-md-4"><h5>Setting</h5></div>
-                <div class="col-md-4"><h5>Current Value</h5></div>
-                <div class="col-md-4"><h5>New Value</h5></div>
+
+        <div class="card border-0 custom-shadow mt-4" style="background-color: #f5f7fa;">
+            <div class="card-body">
+                <h1>Camera Parameters</h1>
+                <form id="parametersForm">
+                    <table class="table table-hover table-borderless table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Setting</th>
+                                <th scope="col">Current Value</th>
+                                <th scope="col">New Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for param_name, param_info in parameters.items() %}
+                            <tr>
+                                <td>
+                                    <label for="{{ param_name }}">
+                                        {{ param_info.label }}
+                                        {% if param_info.unit %}
+                                        ({{ param_info.unit }})
+                                        {% endif %}
+                                    </label>
+                                </td>
+                                <td>
+                                    <span id="{{ param_name }}_current_value" class="current-value">{{ values[param_name] }}</span>
+                                </td>
+                                <td>
+                                    {% if param_info.type == 'select' %}
+                                    <div class="input-group">
+                                        <select id="{{ param_name }}" name="{{ param_name }}" class="form-control">
+                                            {% for option in param_info.options %}
+                                            <option value="{{ option }}" {% if option == values[param_name] %}selected{% endif %}>{{ option }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% else %}
+                                    <div class="input-group">
+                                        <input type="{{ param_info.type }}" 
+                                            id="{{ param_name }}" 
+                                            name="{{ param_name }}" 
+                                            value="{{ values[param_name] }}" 
+                                            class="form-control" 
+                                            placeholder="Enter {{ param_info.label }}"
+                                            {% if param_info.min is defined %}min="{{ param_info.min }}"{% endif %}
+                                            {% if param_info.max is defined %}max="{{ param_info.max }}"{% endif %}
+                                        >
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button type="button" class="btn btn-primary" onclick="updateParameters()">
+                                <i class="fa fa-save"></i> Apply Settings
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetParameters()">
+                                <i class="fa fa-cog"></i> Default Settings
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="restartPipeline()">
+                                <i class="fa fa-redo-alt"></i> Restart Camera
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            {% for param_name, param_info in parameters.items() %}
-                <div class="row mb-1">
-                    <div class="col-md-4">
-                        <label for="{{ param_name }}">
-                            {{ param_info.label }}
-                            {% if param_info.unit %}
-                                ({{ param_info.unit }})
-                            {% endif %}
-                        </label>
-                    </div>
-                    <div class="col-md-4">
-                        <span id="{{ param_name }}_current_value" class="current-value">{{ values[param_name] }}</span>
-                    </div>
-                    <div class="col-md-4">
-                        {% if param_info.type == 'select' %}
-                            <div class="input-group">
-                                <select id="{{ param_name }}" name="{{ param_name }}" class="form-control">
-                                    {% for option in param_info.options %}
-                                        <option value="{{ option }}" {% if option == values[param_name] %}selected{% endif %}>{{ option }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        {% else %}
-                            <div class="input-group">
-                                <input type="{{ param_info.type }}" 
-                                    id="{{ param_name }}" 
-                                    name="{{ param_name }}" 
-                                    value="{{ values[param_name] }}" 
-                                    class="form-control" 
-                                    placeholder="Enter {{ param_info.label }}"
-                                    {% if param_info.min is defined %}min="{{ param_info.min }}"{% endif %}
-                                    {% if param_info.max is defined %}max="{{ param_info.max }}"{% endif %}
-                                    >
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-            <div class="row">
-                <div class="col-md-12 text-right">
-                    <button type="button" class="btn btn-primary" onclick="updateParameters()">
-                        <i class="fa fa-save"></i> Apply Settings
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="resetParameters()">
-                        <i class="fa fa-undo"></i> Default Settings
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="restartPipeline()">
-                        <i class="fa fa-power-off"></i> Restart Camera
-                    </button>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
 {% endblock %}
 
 {% block extra_scripts %}
     <script src="{{ url_for('static', filename='javascript/socket.io.js') }}"></script>
     <script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
-    <script src="{{ url_for('static', filename='javascript/storage.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascript/timesync.js') }}"></script>
 {% endblock %}
