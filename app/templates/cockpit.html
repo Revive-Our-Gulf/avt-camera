@@ -4,12 +4,36 @@
 {% block content %}
 
 <div class="btn-toolbar toolbar-filled justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
-    <div class="input-group">
-        <button type="button" class="btn btn-dark" id="transectNameButton" onclick="openTransectNameOverlay()">
-            <i class="fa fa-pen-to-square"></i> <span id="currentTransectName">Transect Name</span>
-        </button>
-    </div>
     
+    
+    <div class="btn-group">
+        <button id="parametersButton" class="btn btn-primary" onclick="window.open('/parameters', '_blank')">
+            <i class="fas fa-cog"></i>
+        </button>
+
+        <button id="strobeSwitch" class="btn btn-primary" onclick="toggleStrobe()">
+            <i class="fas fa-lightbulb"></i>
+        </button>        
+    </div>
+
+    <div class="btn-group">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary btn-transect" id="transectNameButton" onclick="openTransectNameOverlay()">
+                <i class="fa fa-pen-to-square"></i> <span id="currentTransectName">Transect Name</span>
+            </button>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn btn-success" id="recordButton" onclick="toggleRecording()">
+                <i class="fas fa-play"></i>
+            </button>
+
+            <button type="button" class="btn btn-primary" onclick="window.open('/files', '_blank')">
+                <i class="fa fa-folder"></i>
+            </button>
+        </div>
+        
+    </div>
     <!-- Full-screen overlay for transect name input -->
     <div id="transectNameOverlay" class="overlay">
         <div class="overlay-content">
@@ -22,21 +46,6 @@
                 <button class="btn btn-secondary" onclick="closeTransectNameOverlay()">Cancel</button>
             </div>
         </div>
-    </div>
-
-    <div class="btn-group">
-        <button type="button" class="btn btn-success" id="recordButton" onclick="toggleRecording()">
-            <i class="fas fa-play"></i>
-        </button>
-
-        <button id="strobeSwitch" class="btn btn-dark" onclick="toggleStrobe()">
-            <i class="fas fa-lightbulb"></i>
-        </button>
-        
-        
-        <button id="parametersButton" class="btn btn-dark" onclick="window.open('/parameters', '_blank')">
-            <i class="fas fa-cogs"></i>
-        </button>
     </div>
 </div>
 
