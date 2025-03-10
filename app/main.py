@@ -132,6 +132,7 @@ def handle_get_strobe_state():
 
 @socketio.on('get_storage')
 def emit_storage_info():
+    print("Emitting storage info...")
     disk_usage = psutil.disk_usage('/')
     free_space_gb = disk_usage.free / (1024 * 1024 * 1024)
     total_space_gb = disk_usage.total / (1024 * 1024 * 1024)
@@ -139,7 +140,34 @@ def emit_storage_info():
         'free_space_gb': free_space_gb,
         'total_space_gb': total_space_gb
     })
-    
+
+@socketio.on('get_time_sync')
+def check_time_sync():
+    try:
+        result = subprocess.run(['chronyc', 'tracking'], capture_output=True, text=True)
+        if '192.168.2.2' in result.stdout and 'Stratum         : ' in result.stdout:
+            # Extract the Last offset value
+            last_offset_line = next(line for line in result.stdout.split('\n') if 'Last offset' in line)
+            last_offset = float(last_offset_line.split(':')[1].strip().split()[0])
+            if abs(last_offset) < 1e-6:
+                human_readable_offset = f"{last_offset * 1e9:.1f} ns"
+            elif abs(last_offset) < 1e-3:
+                human_readable_offset = f"{last_offset * 1e6:.1f} µs"
+            elif abs(last_offset) < 1:
+                human_readable_offset = f"{last_offset * 1e3:.1f} ms"
+            elif abs(last_offset) < 60:
+                human_readable_offset = f"{last_offset:.1f} s"
+            elif abs(last_offset) < 3600:
+                human_readable_offset = f"{last_offset / 60:.1f} min"
+            else:
+                human_readable_offset = f"{last_offset / 3600:.1f} h"
+            socketio.emit('time_sync_status', {'status': 'success', 'message': f'Time is synced with BlueOS. Last offset: {human_readable_offset}'})
+        else:
+            socketio.emit('time_sync_status', {'status': 'error', 'message': 'Time is not synced with BlueOS'})
+    except Exception as e:
+        socketio.emit('time_sync_status', {'status': 'error', 'message': str(e)})
+
+
 def emit_images():
     global is_recording, was_recording
     last_image_data = None
@@ -257,7 +285,7 @@ def main():
 
 
 if __name__ == "__main__":
-    thread = threading.Thread(target=lambda: socketio.run(app, host='192.168.2.3', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True))
+    thread = threading.Thread(target=lambda: socketio.run(app, host='0.0.0.0', port=80, debug=True, use_reloader=False, allow_unsafe_werkzeug=True))
     thread.daemon = True
     thread.start()
     main()

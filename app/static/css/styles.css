@@ -1,9 +1,9 @@
-body{
-    margin:0;
-    padding:0;
-    height:100vh; /* or simply use height:100% with body and html */
-    display:flex;
-    flex-direction:column;
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* or simply use height: 100% with body and html */
+    display: flex;
+    flex-direction: column;
     background: transparent;
 }
 
@@ -41,7 +41,34 @@ body{
 }
 
 .toolbar-filled {
-    background-color: rgba(79, 79, 79, 0.1);
+    background-color: rgb(255, 255, 255);
     box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 4px 0px, rgba(0, 0, 0, 0.086) 0px 8px 12px 6px;
     width: 100%;
+}
+
+.stream-container {
+    flex-grow: 1; /* Allow this container to grow and take available space */
+    display: flex;
+    justify-content: center; /* Center the stream horizontally */
+    align-items: center; /* Center the stream vertically */
+    width: 100%;
+    height: 100%;
+}
+
+.stream {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintains aspect ratio while filling the container */
+    object-position: center; /* Center the stream image if it doesn't fill entirely */
+}
+
+.custom-shadow {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+.btn-transect {
+    max-width: 200px; /* Adjust the width as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
