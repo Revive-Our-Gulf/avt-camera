@@ -268,7 +268,6 @@ def main():
 
     try:
         with GstContext(), GstPipeline(DEFAULT_PIPELINE) as pipeline:         
-            
             globals()['pipeline'] = pipeline            
 
             def handle_restart_pipeline():
@@ -288,6 +287,8 @@ def main():
             image_thread.start()
 
             modified_record_folder = None
+
+            utils.pipeline.config.stop(pipeline)
 
             while True:
                 if not pipeline.is_done:
