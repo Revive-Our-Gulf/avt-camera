@@ -33,6 +33,7 @@ socketio = SocketIO(app)
 
 is_recording = False  # Global variable to control recording state
 was_recording = False  # Global variable to track previous recording state
+is_preview_active = False
 record_folder = None # Default folder name
 transect_name = "transect"
 start_time = 0  # Variable to track the start time of the recording
@@ -102,13 +103,20 @@ def get_transect_name():
 
 @socketio.on('toggle_recording')
 def handle_toggle_recording_wrapper(data=None):
-    global is_recording, record_folder, start_time
-
+    global is_recording, record_folder, start_time, is_preview_active, pipeline
+    
+    # Only allow recording when preview is active
+    if not is_preview_active:
+        socketio.emit('error', {'message': 'Cannot start recording without preview active'})
+        return
+    
     is_recording = not is_recording
-
+    
     if is_recording:
         start_time = time.time()
-        print(f"Recording started in folder {record_folder}")
+        if data and 'folderName' in data:
+            transect_name = data['folderName'].strip() or 'transect'
+        print(f"Recording started with name {transect_name}")
     else:
         start_time = 0
         print("Recording stopped.")
@@ -116,6 +124,7 @@ def handle_toggle_recording_wrapper(data=None):
     # Emit the updated state to all clients
     elapsed_time = (time.time() - start_time) if is_recording else 0
     socketio.emit('current_recording_state', {'isRecording': is_recording, 'elapsedTime': elapsed_time})
+
 
 @socketio.on('get_recording_state')
 def handle_get_recording_state(data=None):
@@ -167,86 +176,86 @@ def check_time_sync():
     except Exception as e:
         socketio.emit('time_sync_status', {'status': 'error', 'message': str(e)})
 
+@socketio.on('start_preview')
+def handle_start_preview():
+    global is_preview_active, pipeline
+    
+    if pipeline is None:
+        socketio.emit('error', {'message': 'Camera not available. Please restart the application.'})
+        return
+    
+    if not is_preview_active:
+        try:
+            # Use the existing start function from config
+            utils.pipeline.config.start(pipeline)
+            is_preview_active = True
+            socketio.emit('preview_state', {'isActive': is_preview_active})
+        except Exception as e:
+            logging.error(f"Failed to start preview: {e}")
+            socketio.emit('error', {'message': f'Failed to start camera preview: {str(e)}'})
+
+@socketio.on('stop_preview')
+def handle_stop_preview():
+    global is_preview_active, pipeline, is_recording
+    
+    if pipeline is None:
+        socketio.emit('error', {'message': 'Camera not available. Please restart the application.'})
+        return
+    
+    # Don't allow stopping preview while recording
+    if is_recording:
+        socketio.emit('error', {'message': 'Cannot stop preview while recording is active'})
+        return
+    
+    if is_preview_active:
+        try:
+            # Use the existing stop function from config
+            utils.pipeline.config.stop(pipeline)
+            is_preview_active = False
+            socketio.emit('preview_state', {'isActive': is_preview_active})
+        except Exception as e:
+            logging.error(f"Failed to stop preview: {e}")
+            socketio.emit('error', {'message': f'Failed to stop camera preview: {str(e)}'})
+
+@socketio.on('get_preview_state')
+def handle_get_preview_state():
+    global is_preview_active
+    socketio.emit('preview_state', {'isActive': is_preview_active})
+
 
 def emit_images():
-    global is_recording, was_recording
+    global is_recording, was_recording, is_preview_active
     last_image_data = None
 
     while True:
-        with open('/home/pi/Repos/avt-camera/stream.jpg', 'rb') as image_file:
-            image_data = image_file.read()
-            if image_data != last_image_data:
-                encoded_image = base64.b64encode(image_data).decode('utf-8')
-                socketio.emit('image_update', {'image': encoded_image})
-                last_image_data = image_data
-        time.sleep(0.1)  # Emit images at 10 frames per second (100 ms delay)
-
-def convert_jpegs_to_mjpeg(record_folder, fps=25):
-    # Specify the folder containing the images
-    output_video_path = record_folder + "/output.avi"
-    fps = 2  # Frames per second of the video
-    scale_factor = 0.125
-
-    # Regex to match image filenames
-    image_pattern = re.compile(r"IMG_(\d+)_\(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\)\.jpg")
-
-    # Get a sorted list of matching image filenames
-    images = [
-        img for img in os.listdir(record_folder)
-        if image_pattern.match(img)
-    ]
-    images.sort(key=lambda x: int(image_pattern.match(x).group(1)))
-
-    # Check if images are found
-    if not images:
-        print("No matching images found in the folder.")
-        exit()
-
-    # Read the first image to get the dimensions
-    first_image_path = os.path.join(record_folder, images[0])
-    first_image = cv2.imread(first_image_path)
-    original_height, original_width, _ = first_image.shape
-
-    new_width = int(original_width * scale_factor)
-    new_height = int(original_height * scale_factor)
-    new_size = (new_width, new_height)
-
-    # Define the codec and create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'MJPG')  # MJPEG codec
-    out = cv2.VideoWriter(output_video_path, fourcc, fps, new_size)
-
-    # Write each image to the video
-    for image_file in images:
-        image_path = os.path.join(record_folder, image_file)
-        frame = cv2.imread(image_path)
-
-        # Resize the frame
-        downscaled_frame = cv2.resize(frame, new_size, interpolation=cv2.INTER_AREA)
-
-        # Write the downscaled frame to the video
-        out.write(downscaled_frame)
-
-    # Release the VideoWriter
-    out.release()
-
-    print(f"Downscaled video saved as {output_video_path}")         
-
+        try:
+            # Only try to read the image if preview is active
+            if is_preview_active:
+                with open('/home/pi/Repos/avt-camera/stream.jpg', 'rb') as image_file:
+                    image_data = image_file.read()
+                    if image_data != last_image_data:
+                        encoded_image = base64.b64encode(image_data).decode('utf-8')
+                        socketio.emit('image_update', {'image': encoded_image})
+                        last_image_data = image_data
+        except Exception as e:
+            # If there's an error reading the file, just continue
+            pass
+            
+        time.sleep(0.1)
 
 def main():
     global is_recording, was_recording, record_folder, start_time
     was_recording = False  # Initialize was_recording
+    is_preview_active = False
 
     # utils.camera.wait_for_camera('DEV_000A4700155E')
     utils.network.modify_mtu()
-
     utils.storage.ensure_stream_image_exists()
 
     try:
         with GstContext(), GstPipeline(DEFAULT_PIPELINE) as pipeline:         
             
-            utils.pipeline.config.setup(pipeline)
-
-            
+            globals()['pipeline'] = pipeline            
 
             def handle_restart_pipeline():
                 global is_recording, start_time
