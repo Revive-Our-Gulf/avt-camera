@@ -66,13 +66,6 @@ def register_handlers(socketio, camera_controller):
         else:
             socketio.emit('error', {'message': 'Failed to restart pipeline'})
 
-    @socketio.on('get_strobe_state')
-    def handle_get_strobe_state():
-        parameters = core.json.get_parameters('/home/pi/Repos/avt-camera/app/settings/parameters.json')
-        values = core.xml.get_values_from_xml('/home/pi/Repos/avt-camera/app/settings/current.xml', parameters)
-        current_value = values.get('LineSource+Line2', 'Off')
-        socketio.emit('strobe_state', {'value': current_value})
-
     @socketio.on('get_storage')
     def emit_storage_info():
         disk_usage = psutil.disk_usage('/')
