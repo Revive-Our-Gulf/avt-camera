@@ -1,16 +1,15 @@
 import time
 from gstreamer import Gst
-from utils import storage
+from app.core import storage
 import shutil
-from .valve import update_valve
 from . import appsink
+from app.config.settings import CURRENT_XML
 
 def save_parameters(record_path):
-    parameters_file = '/home/pi/Repos/avt-camera/app/settings/current.xml'
     parameters_destination = record_path + '/current.xml'
-    print(parameters_file)
+    print(CURRENT_XML)
     print(parameters_destination)
-    shutil.copy(parameters_file, parameters_destination)
+    shutil.copy(CURRENT_XML, parameters_destination)
 
 
 def start(pipeline, record_folder):

@@ -1,7 +1,6 @@
 import time
 from gstreamer import Gst
-from utils import storage
-from .valve import update_valve
+from app.core import storage
 from . import appsink
 
 

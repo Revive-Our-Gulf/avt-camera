@@ -4,7 +4,7 @@ from vmbpy import *
 
 from gstreamer import GstContext, GstPipeline, GstApp, Gst, GstVideo, GstPipeline
 import gstreamer.utils as gst_utils
-import utils
+import app.core as core
 
 import gi
 gi.require_version('Gst', '1.0')
