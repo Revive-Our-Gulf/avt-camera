@@ -2,13 +2,14 @@ import os
 import logging
 from PIL import Image
 from datetime import datetime
+from app.core.mavlink_connector import get_mavlink_timestamp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def create_recording_folder(base_folder_name):
 
-    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    current_time = get_mavlink_timestamp().strftime("%Y-%m-%d_%H-%M-%S")
     sanitised_base_folder_name = base_folder_name.replace(" ", "_")
 
     folder_name = f"{current_time}_{sanitised_base_folder_name}"
