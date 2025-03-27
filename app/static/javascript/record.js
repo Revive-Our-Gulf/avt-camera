@@ -1,12 +1,7 @@
 var socket = io();
 
 function toggleRecording() {
-    // Only proceed if the button is not disabled
-    var recordButton = document.getElementById('recordButton');
-    if (recordButton.disabled) {
-        return;
-    }
-    
+    // No need to check if button is disabled, as we'll handle camera start automatically
     var folderNameInput = document.getElementById('folderName');
     var folderName = folderNameInput.value.trim() || 'transect';
     

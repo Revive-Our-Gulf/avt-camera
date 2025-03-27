@@ -105,11 +105,18 @@ def get_transect_name():
 def handle_toggle_recording_wrapper(data=None):
     global is_recording, record_folder, start_time, is_preview_active, pipeline
     
-    # Only allow recording when preview is active
-    if not is_preview_active:
-        socketio.emit('error', {'message': 'Cannot start recording without preview active'})
-        return
+    # If not recording and not previewing, start preview first
+    if not is_recording and not is_preview_active:
+        try:
+            utils.pipeline.config.start(pipeline)
+            is_preview_active = True
+            socketio.emit('preview_state', {'isActive': is_preview_active})
+        except Exception as e:
+            logging.error(f"Failed to start preview: {e}")
+            socketio.emit('error', {'message': f'Failed to start camera preview: {str(e)}'})
+            return
     
+    # Toggle recording state
     is_recording = not is_recording
     
     if is_recording:
@@ -120,6 +127,14 @@ def handle_toggle_recording_wrapper(data=None):
     else:
         start_time = 0
         print("Recording stopped.")
+        # Automatically stop the preview when recording stops
+        try:
+            utils.pipeline.config.stop(pipeline)
+            is_preview_active = False
+            socketio.emit('preview_state', {'isActive': is_preview_active})
+            print("Camera preview stopped automatically after recording")
+        except Exception as e:
+            logging.error(f"Failed to stop preview after recording: {e}")
 
     # Emit the updated state to all clients
     elapsed_time = (time.time() - start_time) if is_recording else 0
@@ -282,6 +297,7 @@ def main():
                     elif not is_recording and was_recording:
                         utils.pipeline.recording.stop(pipeline)
                         start_time = 0
+                        # We don't need to stop the preview here since it's already handled in the toggle_recording handler
                     
                     was_recording = is_recording
                 time.sleep(.25)
