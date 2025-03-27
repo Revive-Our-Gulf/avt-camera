@@ -11,10 +11,9 @@ def handle_toggle_recording(data):
 
 
 
-def handle_update_parameters(data, pipeline):
-
+def handle_update_parameters(data, pipeline, is_preview_active, is_recording):
     root = utils.xml.read('/home/pi/Repos/avt-camera/app/settings/current.xml')
-
+    
     print(f" data is {data}")
 
     utils.xml.update_from_json(root, data)
@@ -22,12 +21,9 @@ def handle_update_parameters(data, pipeline):
 
     emit('parameters_updated', data)
 
-    utils.pipeline.config.restart(pipeline)
-
-    for param_name, param_value in data.items():
-        if param_name == "StreamResolution":
-            print("Updating stream resolution")
-            pipeline = pipeline.update_stream_resolution(pipeline, param_value)
+    if is_preview_active and not is_recording:
+        print("Restarting pipeline")
+        utils.pipeline.config.restart(pipeline)
 
 def handle_reset_parameters(pipeline):
     root = utils.xml.read('/home/pi/Repos/avt-camera/app/settings/current.xml')

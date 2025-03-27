@@ -244,9 +244,8 @@ def emit_images():
         time.sleep(0.1)
 
 def main():
-    global is_recording, was_recording, record_folder, start_time
+    global is_recording, was_recording, record_folder, start_time, is_preview_active
     was_recording = False  # Initialize was_recording
-    is_preview_active = False
 
     # utils.camera.wait_for_camera('DEV_000A4700155E')
     utils.network.modify_mtu()
@@ -265,15 +264,13 @@ def main():
 
 
             socketio.on_event('toggle_recording', handle_toggle_recording_wrapper)
-            socketio.on_event('update_parameters', lambda data: handlers.handle_update_parameters(data, pipeline))
+            socketio.on_event('update_parameters', lambda data: handlers.handle_update_parameters(data, pipeline, is_preview_active, is_recording))
             socketio.on_event('reset_parameters', lambda: handlers.handle_reset_parameters(pipeline))
             socketio.on_event('restart_pipeline', handle_restart_pipeline)
 
             image_thread = threading.Thread(target=emit_images)
             image_thread.daemon = True
             image_thread.start()
-
-
 
             modified_record_folder = None
 
