@@ -72,3 +72,9 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.read-only-input {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.8;
+}

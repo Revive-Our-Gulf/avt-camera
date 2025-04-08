@@ -1,78 +1,214 @@
 {
-    "ExposureAuto": {
-        "type": "select",
-        "options": [
-            "Off",
-            "Once",
-            "Continuous"
-        ],
-        "label": "Exposure Auto"
-    },
-    "ExposureTime": {
-        "type": "number",
-        "label": "Exposure Time",
-        "unit": "μs",
-        "min": 300,
-        "max": 100000
-    },
-    "GainAuto": {
-        "type": "select",
-        "options": [
-            "Off",
-            "Once",
-            "Continuous"
-        ],
-        "label": "Gain Auto"
-    },
-    "Gain": {
-        "type": "number",
-        "label": "Gain",
-        "unit": "dB",
-        "min": 1,
-        "max": 24
-    },
-    "AcquisitionFrameRate": {
-        "type": "number",
-        "label": "Acquisition Frame Rate",
-        "unit": "fps",
-        "min": 0.1,
-        "max": 3.3
-    },
-    "BalanceWhiteAuto": {
-        "type": "select",
-        "options": [
-            "Off",
-            "Once",
-            "Continuous"
-        ],
-        "label": "Balance White Auto"
-    },
-    "BalanceRatio+Red": {
-        "entry": "Red",
-        "feature": "BalanceRatio",
-        "type": "number",
-        "label": "Balance Ratio Red",
-        "unit": "ratio",
-        "min": 0.1,
-        "max": 10.0
-    },
-    "BalanceRatio+Blue": {
-        "entry": "Blue",
-        "feature": "BalanceRatio",
-        "type": "number",
-        "label": "Balance Ratio Blue",
-        "unit": "ratio",
-        "min": 0.1,
-        "max": 10.0
-    },
-    "LineSource+Line2": {
-        "entry": "Line2",
-        "feature": "LineSource",
-        "type": "select",
-        "options": [
-            "Off",
-            "ExposureActive"
-        ],
-        "label": "Strobe"
-    }
+    "parameters": [
+        {
+            "id": "ExposureTime",
+            "name": "Exposure Time",
+            "type": "number",
+            "unit": "\u03bcs",
+            "default": 2000.0,
+            "value": 5000,
+            "min": 300.0,
+            "max": 50000.0,
+            "writeable": true
+        },
+        {
+            "id": "ExposureAuto",
+            "name": "Exposure Auto",
+            "type": "select",
+            "default": "Off",
+            "value": "Off",
+            "options": [
+                "Off",
+                "Once",
+                "Continuous"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "TriggerMode",
+            "name": "Trigger Mode",
+            "type": "select",
+            "default": "On",
+            "value": "On",
+            "options": [
+                "On",
+                "Off"
+            ],
+            "writeable": false
+        },
+        {
+            "id": "TriggerSource",
+            "name": "Trigger Source",
+            "type": "select",
+            "default": "Software",
+            "value": "Software",
+            "options": [
+                "Software",
+                "Hardware"
+            ],
+            "writeable": false
+        },
+        {
+            "id": "TriggerSelector",
+            "name": "Trigger Selector",
+            "type": "select",
+            "default": "FrameStart",
+            "value": "FrameStart",
+            "options": [
+                "FrameStart",
+                "FrameBurstStart"
+            ],
+            "writeable": false
+        },
+        {
+            "id": "AcquisitionMode",
+            "name": "Acquisition Mode",
+            "type": "select",
+            "default": "Continuous",
+            "value": "Continuous",
+            "options": [
+                "Continuous",
+                "SingleFrame"
+            ],
+            "writeable": false
+        },
+        {
+            "id": "LineSelector",
+            "name": "Line Selector",
+            "type": "select",
+            "default": "Line2",
+            "value": "Line2",
+            "options": [
+                "Line1",
+                "Line2",
+                "Line3"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "LineMode",
+            "name": "Line Mode",
+            "type": "select",
+            "default": "Output",
+            "value": "Output",
+            "options": [
+                "Input",
+                "Output"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "LineSource",
+            "name": "Strobe",
+            "type": "select",
+            "default": "ExposureActive",
+            "value": "ExposureActive",
+            "options": [
+                "ExposureActive",
+                "FrameTriggerWait",
+                "Off"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "Gain",
+            "name": "Gain",
+            "type": "number",
+            "unit": "dB",
+            "default": 12.0,
+            "value": 12.0,
+            "min": 0.0,
+            "max": 24.0,
+            "writeable": true
+        },
+        {
+            "id": "GainAuto",
+            "name": "Gain Auto",
+            "type": "select",
+            "default": "Off",
+            "value": "Off",
+            "options": [
+                "Off",
+                "Once",
+                "Continuous"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "Width",
+            "name": "Width",
+            "type": "number",
+            "unit": "pixels",
+            "default": 4112,
+            "value": 4112,
+            "min": 8,
+            "max": 4112,
+            "writeable": false
+        },
+        {
+            "id": "Height",
+            "name": "Height",
+            "type": "number",
+            "unit": "pixels",
+            "default": 3008,
+            "value": 3008,
+            "min": 8,
+            "max": 3008,
+            "writeable": false
+        },
+        {
+            "id": "BalanceWhiteAuto",
+            "name": "White Balance Auto",
+            "type": "select",
+            "default": "Off",
+            "value": "Off",
+            "options": [
+                "Off",
+                "Once",
+                "Continuous"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "BalanceRatioSelector",
+            "name": "White Balance Selector",
+            "type": "select",
+            "default": "Red",
+            "value": "Red",
+            "options": [
+                "Red",
+                "Blue"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "BalanceRatio",
+            "name": "White Balance Ratio",
+            "type": "number",
+            "default": 2.35,
+            "value": 2.35009765625,
+            "min": 0.0,
+            "max": 8.0,
+            "writeable": true
+        },
+        {
+            "id": "Gamma",
+            "name": "Gamma",
+            "type": "number",
+            "default": 1.0,
+            "value": 1.0,
+            "min": 0.4,
+            "max": 2.4,
+            "writeable": true
+        },
+        {
+            "id": "IntensityControllerTarget",
+            "name": "Intensity Controller Target",
+            "type": "number",
+            "default": 50.0,
+            "value": 50.0,
+            "min": 0.0,
+            "max": 90.0
+        }
+    ]
 }
