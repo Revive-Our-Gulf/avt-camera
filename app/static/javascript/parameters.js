@@ -143,19 +143,11 @@ document.addEventListener('DOMContentLoaded', function() {
         table.appendChild(tbody);
         parametersContainer.appendChild(table);
     
-        // Add status message div
-        const statusDiv = document.createElement('div');
-        statusDiv.id = 'statusMessage';
-        statusDiv.className = 'alert mt-3';
-        statusDiv.style.display = 'none';
-        parametersContainer.appendChild(statusDiv);
     }
     
-    // Event listener for apply button
-    parametersContainer.addEventListener('click', function(event) {
-        if (event.target && event.target.id === 'applySettingsButton') {
-            applySettings();
-        }
+    document.getElementById('cameraSettingsForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form from submitting normally
+        applySettings();
     });
     
     // Function to apply settings to camera

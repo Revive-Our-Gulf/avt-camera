@@ -6,7 +6,7 @@
             "type": "number",
             "unit": "\u03bcs",
             "default": 2000.0,
-            "value": 5000,
+            "value": 5013.374,
             "min": 300.0,
             "max": 50000.0,
             "writeable": true
@@ -24,6 +24,69 @@
             ],
             "writeable": true
         },
+        {
+            "id": "LineSource",
+            "name": "Strobe",
+            "type": "select",
+            "default": "ExposureActive",
+            "value": "ExposureActive",
+            "options": [
+                "ExposureActive",
+                "FrameTriggerWait",
+                "Off"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "Gain",
+            "name": "Gain",
+            "type": "number",
+            "unit": "dB",
+            "default": 12.0,
+            "value": 12.0,
+            "min": 0.0,
+            "max": 24.0,
+            "writeable": true
+        },
+        {
+            "id": "GainAuto",
+            "name": "Gain Auto",
+            "type": "select",
+            "default": "Off",
+            "value": "Off",
+            "options": [
+                "Off",
+                "Once",
+                "Continuous"
+            ],
+            "writeable": true
+        },
+        {
+            "id": "LineSelector",
+            "name": "Line Selector",
+            "type": "select",
+            "default": "Line2",
+            "value": "Line2",
+            "options": [
+                "Line1",
+                "Line2",
+                "Line3"
+            ],
+            "writeable": false
+        },
+        {
+            "id": "LineMode",
+            "name": "Line Mode",
+            "type": "select",
+            "default": "Output",
+            "value": "Output",
+            "options": [
+                "Input",
+                "Output"
+            ],
+            "writeable": false
+        },
+        
         {
             "id": "TriggerMode",
             "name": "Trigger Mode",
@@ -71,68 +134,6 @@
                 "SingleFrame"
             ],
             "writeable": false
-        },
-        {
-            "id": "LineSelector",
-            "name": "Line Selector",
-            "type": "select",
-            "default": "Line2",
-            "value": "Line2",
-            "options": [
-                "Line1",
-                "Line2",
-                "Line3"
-            ],
-            "writeable": true
-        },
-        {
-            "id": "LineMode",
-            "name": "Line Mode",
-            "type": "select",
-            "default": "Output",
-            "value": "Output",
-            "options": [
-                "Input",
-                "Output"
-            ],
-            "writeable": true
-        },
-        {
-            "id": "LineSource",
-            "name": "Strobe",
-            "type": "select",
-            "default": "ExposureActive",
-            "value": "ExposureActive",
-            "options": [
-                "ExposureActive",
-                "FrameTriggerWait",
-                "Off"
-            ],
-            "writeable": true
-        },
-        {
-            "id": "Gain",
-            "name": "Gain",
-            "type": "number",
-            "unit": "dB",
-            "default": 12.0,
-            "value": 12.0,
-            "min": 0.0,
-            "max": 24.0,
-            "writeable": true
-        },
-        {
-            "id": "GainAuto",
-            "name": "Gain Auto",
-            "type": "select",
-            "default": "Off",
-            "value": "Off",
-            "options": [
-                "Off",
-                "Once",
-                "Continuous"
-            ],
-            "writeable": true
         },
         {
             "id": "Width",
