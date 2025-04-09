@@ -159,8 +159,7 @@ class CameraHardwareController:
     def trigger_frame(self, camera):
         with self.frame_trigger_time_lock:
             now = datetime.now()
-            timestamp = now.strftime('%Y_%m_%d_%H-%M-%S') + f'-{int(now.microsecond / 10000):02d}'
-            self.frame_trigger_time = timestamp
+            self.frame_trigger_time = now
 
         camera.TriggerSoftware.run()
 
