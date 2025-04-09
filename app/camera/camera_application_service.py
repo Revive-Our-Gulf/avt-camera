@@ -4,6 +4,7 @@ from settings_manager import SettingsManager
 from vmbpy import EnumEntry
 import os
 import json
+import time
 
 class CameraApplicationService:
     def __init__(self, state_machine, camera_hardware_controller, socketio=None):
@@ -18,6 +19,14 @@ class CameraApplicationService:
         current_state = self.state_machine.get_state()
         if new_state == CameraState.WRITE and current_state != CameraState.WRITE:
             self.set_recording_folder(folder_name)
+            self.camera_hardware_controller.frame_index = 0
+            self.camera_hardware_controller.start_time = time.time()
+
+        if new_state == CameraState.PREVIEW and current_state != CameraState.PREVIEW:
+            self.camera_hardware_controller.frame_index = 0
+            self.camera_hardware_controller.start_time = time.time()
+
+        
     
         success = self.state_machine.toggle_state(new_state)
         
@@ -27,9 +36,13 @@ class CameraApplicationService:
         return success
     
     def set_recording_folder(self, folder_name=None):
+        now = datetime.now()
+        time_str = now.strftime('%Y-%m-%d_%H-%M-%S')
+        
         if folder_name is None:
-            now = datetime.now()
-            folder_name = now.strftime('%Y-%m-%d_%H-%M-%S')
+            folder_name = f"{time_str}_transect"
+        else:
+            folder_name = f"{time_str}_{folder_name}"
         
         path = os.path.join(self.base_output_dir, folder_name)
         os.makedirs(path, exist_ok=True)

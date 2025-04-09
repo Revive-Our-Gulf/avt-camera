@@ -35,10 +35,10 @@ def generate_frames():
 def frame_saver_worker():
     while True:
         try:
-            image, timestamp = frame_save_queue.get()
+            image, timestamp, frame_index = frame_save_queue.get()
             folder = camera_service.current_recording_folder
             if folder:
-                filename = os.path.join(folder, f"frame_{timestamp}.jpg")
+                filename = os.path.join(folder, f"IMG_{frame_index}_{timestamp}.jpg")
                 import cv2
                 cv2.imwrite(filename, image)
                 print(f"Saved frame to {filename}")

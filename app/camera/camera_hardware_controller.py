@@ -20,6 +20,11 @@ class CameraHardwareController:
         self.focus_mode = False
         self.settings_manager = SettingsManager()
 
+        self.frame_index = 0
+        self.start_time = None
+        self.frame_trigger_time = None
+        self.frame_trigger_time_lock = threading.Lock()
+
     def requires_camera(default_return=None):
         """Decorator that checks if a camera is available before executing a method"""
         def decorator(func):
@@ -56,8 +61,9 @@ class CameraHardwareController:
     
     def frame_handler(self, cam: Camera, stream: Stream, frame: Frame):
         if frame.get_status() == FrameStatus.Complete:
+
+
             image = frame.as_numpy_ndarray()
-            
             image = cv2.cvtColor(image, cv2.COLOR_BayerRG2RGB)
             
             if image.dtype == np.uint16:
@@ -68,16 +74,15 @@ class CameraHardwareController:
 
             image_stream = cv2.resize(image, (1028, 752), interpolation=cv2.INTER_AREA)
 
-            now = datetime.now()
-            timestamp = now.strftime('%Y_%m_%d_%H-%M-%S') + f'-{int(now.microsecond / 10000):02d}'
-            
+        
             _, jpeg = cv2.imencode('.jpg', image_stream)
             with self.frame_lock:
                 self.frame_buffer = jpeg.tobytes()
             
             if self.state_machine.should_save():
                 if not self.frame_save_queue.full():
-                    self.frame_save_queue.put((image.copy(), timestamp))
+                    with self.frame_trigger_time_lock:
+                        self.frame_save_queue.put((image.copy(), self.frame_trigger_time, self.frame_index))
         
         cam.queue_frame(frame)
     
@@ -145,36 +150,35 @@ class CameraHardwareController:
                 with self.camera_lock:
                     self.current_camera = None
 
-    def interval_met(self, last_trigger_time, target_interval):
-        current_time = time.time()
-        elapsed_time = current_time - last_trigger_time
-        return elapsed_time >= target_interval
+    def interval_met(self, target_interval):
+        if time.time() >= (self.frame_index * target_interval + self.start_time):
+            self.frame_index += 1
+            return True
+        return False
+
+    def trigger_frame(self, camera):
+        with self.frame_trigger_time_lock:
+            now = datetime.now()
+            timestamp = now.strftime('%Y_%m_%d_%H-%M-%S') + f'-{int(now.microsecond / 10000):02d}'
+            self.frame_trigger_time = timestamp
+
+        camera.TriggerSoftware.run()
 
     def _process_frames(self, camera):
         target_preview_interval = 0.5
         target_time_interval = 1
         target_distance = 1
-        last_trigger_time = time.time()
 
         while True:
             if self.state_machine.should_stream():
                 if self.state_machine.get_state() == CameraState.PREVIEW:
-                    current_time = time.time()
-                    elapsed_time = current_time - last_trigger_time
-
-                    if elapsed_time >= target_preview_interval:
-                        camera.TriggerSoftware.run()
-                        last_trigger_time = current_time
-
+                    if self.interval_met(target_preview_interval):
+                        self.trigger_frame(camera)
+                        
                 elif self.state_machine.get_state() == CameraState.WRITE:
                     if self.state_machine.trigger_mode == TriggerMode.TIME:
-                        current_time = time.time()
-                        elapsed_time = current_time - last_trigger_time
-
-                        if elapsed_time >= target_preview_interval:
-                            camera.TriggerSoftware.run()
-                            last_trigger_time = current_time
-
+                        if self.interval_met(target_time_interval):
+                            self.trigger_frame(camera)
                     else:
                         pass
 
