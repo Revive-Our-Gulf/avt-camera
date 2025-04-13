@@ -1,0 +1,17 @@
+{
+    "camera": {
+      "Make": "Allied Vision",
+      "Model": "Alvium G1-1236",
+      "Software": "Revive-Our-Gulf/avt-camera",
+      "Artist": "Revive Our Gulf"
+    },
+    "lens": {
+      "LensMake": "Commonlands",
+      "LensModel": "8mm C-Mount Lens 1.1\" 12MP",
+      "FocalLength": [850, 100],
+      "ApertureValue": [9999, 100]
+    },
+    "other": {
+      "Comments": "AVT Camera System"
+    }
+  }

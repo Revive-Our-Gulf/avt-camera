@@ -27,6 +27,7 @@ class SettingsManager:
         filtered_settings = {}
 
         for param_id, value in settings.items():
+            print(f"Processing setting: {param_id}={value}")
             param_def = self.get_parameter_by_id(param_id)
             if param_def and not param_def.get("writeable", False):
                 continue
@@ -56,3 +57,61 @@ class SettingsManager:
         except Exception as e:
             print(f"Error saving parameters: {e}")
             return False
+        
+    def get_exif_settings(self):
+        exif_path = os.path.join(self.settings_dir, 'exif_data.json')
+        try:
+            with open(exif_path, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading EXIF settings: {e}")
+            return {
+                "camera": {}, 
+                "lens": {}, 
+                "exposure": {}, 
+                "other": {}
+            }
+
+    def get_app_settings_definitions(self):
+        app_settings_path = os.path.join(self.settings_dir, 'app_settings.json')
+        try:
+            with open(app_settings_path, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading app settings: {e}")
+            return {"settings": []}
+
+    def get_app_settings(self):
+        """Get all app settings as a dictionary of id:value pairs"""
+        settings_dict = {}
+        settings_data = self.get_app_settings_definitions()
+        
+        for setting in settings_data.get("settings", []):
+            settings_dict[setting["id"]] = setting["value"]
+        
+        return settings_dict
+
+    def update_app_settings(self, new_settings):
+        """Update app settings with provided values"""
+        try:
+            app_settings_data = self.get_app_settings_definitions()
+            
+            for setting in app_settings_data.get("settings", []):
+                if setting["id"] in new_settings:
+                    # Type conversion to ensure data consistency
+                    if setting["type"] == "number":
+                        setting["value"] = float(new_settings[setting["id"]])
+                    elif setting["type"] == "boolean":
+                        setting["value"] = bool(new_settings[setting["id"]])
+                    else:
+                        setting["value"] = new_settings[setting["id"]]
+            
+            # Write updated settings back to file
+            app_settings_path = os.path.join(self.settings_dir, 'app_settings.json')
+            with open(app_settings_path, 'w') as f:
+                json.dump(app_settings_data, f, indent=4)
+            
+            return True, "Settings updated successfully"
+        except Exception as e:
+            print(f"Error updating app settings: {e}")
+            return False, str(e)

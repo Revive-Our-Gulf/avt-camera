@@ -10,7 +10,7 @@ import numpy as np
 from state_machine import CameraState, TriggerMode
 
 class CameraHardwareController:
-    def __init__(self, state_machine, frame_save_queue):
+    def __init__(self, state_machine, frame_save_queue, mavlink_handler):
         self.state_machine = state_machine
         self.frame_save_queue = frame_save_queue
         self.current_camera = None
@@ -19,11 +19,25 @@ class CameraHardwareController:
         self.frame_lock = threading.Lock()
         self.focus_mode = False
         self.settings_manager = SettingsManager()
+        self.mavlink_handler = mavlink_handler
 
         self.frame_index = 0
         self.start_time = None
         self.frame_trigger_time = None
         self.frame_trigger_time_lock = threading.Lock()
+
+        self.time_interval = 1.0      # Default 1 second for time triggering
+        self.preview_interval = 0.5 
+
+        self.last_telemetry = None
+
+    def set_time_interval(self, interval_seconds):
+        self.time_interval = interval_seconds
+        print(f"Time interval set to {interval_seconds} seconds")
+        
+    def set_preview_interval(self, interval_seconds):
+        self.preview_interval = interval_seconds
+        print(f"Preview interval set to {interval_seconds} seconds")
 
     def requires_camera(default_return=None):
         """Decorator that checks if a camera is available before executing a method"""
@@ -61,7 +75,7 @@ class CameraHardwareController:
     
     def frame_handler(self, cam: Camera, stream: Stream, frame: Frame):
         if frame.get_status() == FrameStatus.Complete:
-
+            print(f"Timestamp: {self.frame_trigger_time}")
 
             image = frame.as_numpy_ndarray()
             image = cv2.cvtColor(image, cv2.COLOR_BayerRG2RGB)
@@ -82,7 +96,7 @@ class CameraHardwareController:
             if self.state_machine.should_save():
                 if not self.frame_save_queue.full():
                     with self.frame_trigger_time_lock:
-                        self.frame_save_queue.put((image.copy(), self.frame_trigger_time, self.frame_index))
+                        self.frame_save_queue.put((image.copy(), self.frame_trigger_time, self.frame_index, self.last_telemetry))
         
         cam.queue_frame(frame)
     
@@ -151,8 +165,9 @@ class CameraHardwareController:
                     self.current_camera = None
 
     def interval_met(self, target_interval):
-        if time.time() >= (self.frame_index * target_interval + self.start_time):
-            self.frame_index += 1
+        current_time = time.time()
+        trigger_time = self.frame_index * target_interval + self.start_time
+        if current_time >= trigger_time:
             return True
         return False
 
@@ -160,26 +175,26 @@ class CameraHardwareController:
         with self.frame_trigger_time_lock:
             now = datetime.now()
             self.frame_trigger_time = now
+            self.frame_index += 1
+            self.last_telemetry = self.mavlink_handler.get_telemetry()
 
         camera.TriggerSoftware.run()
 
     def _process_frames(self, camera):
-        target_preview_interval = 0.5
-        target_time_interval = 1
-        target_distance = 1
-
         while True:
             if self.state_machine.should_stream():
                 if self.state_machine.get_state() == CameraState.PREVIEW:
-                    if self.interval_met(target_preview_interval):
+                    if self.interval_met(self.preview_interval):
                         self.trigger_frame(camera)
                         
                 elif self.state_machine.get_state() == CameraState.WRITE:
                     if self.state_machine.trigger_mode == TriggerMode.TIME:
-                        if self.interval_met(target_time_interval):
+                        if self.interval_met(self.time_interval):
                             self.trigger_frame(camera)
-                    else:
-                        pass
+                    elif self.state_machine.trigger_mode == TriggerMode.DISTANCE:
+                        if self.mavlink_handler and self.mavlink_handler.should_trigger_photo_by_distance():
+                            self.trigger_frame(camera)
+                            self.mavlink_handler.reset_distance_tracking()
 
             time.sleep(0.01)
     
@@ -254,3 +269,4 @@ class CameraHardwareController:
             if str(entry) == str(value):
                 feature.set(entry)
                 break
+

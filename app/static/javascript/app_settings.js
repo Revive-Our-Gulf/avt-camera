@@ -19,14 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('Failed to load settings', 'danger');
         });
 
-    // Format value with description if present
-    function formatDescription(setting) {
-        if (setting.description) {
-            return `<small class="form-text text-muted">${setting.description}</small>`;
-        }
-        return '';
-    }
-
     // Function to generate form elements based on setting definitions
     function generateSettingsForm(settings) {
         settingsContainer.innerHTML = ''; // Clear loading spinner
@@ -68,18 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     inputElement.appendChild(checkboxInput);
                     inputElement.appendChild(checkboxLabel);
                     break;
-                case 'number':
-                    inputElement = document.createElement('input');
-                    inputElement.type = 'number';
-                    inputElement.className = 'form-control';
-                    inputElement.id = setting.id;
-                    inputElement.name = setting.id;
-                    inputElement.value = setting.value;
                     
-                    if (setting.min !== undefined) inputElement.min = setting.min;
-                    if (setting.max !== undefined) inputElement.max = setting.max;
-                    break;
-                case 'select':
+                case 'select': // Handle select type
+                case 'enum':   // Also handle enum type the same way
                     inputElement = document.createElement('select');
                     inputElement.className = 'form-select';
                     inputElement.id = setting.id;
@@ -95,6 +78,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         inputElement.appendChild(optionElement);
                     }
                     break;
+                    
+                case 'number':
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'number';
+                    inputElement.className = 'form-control';
+                    inputElement.id = setting.id;
+                    inputElement.name = setting.id;
+                    inputElement.value = setting.value || '';
+                    if (setting.min !== undefined) inputElement.min = setting.min;
+                    if (setting.max !== undefined) inputElement.max = setting.max;
+                    inputElement.step = setting.step || 'any';
+                    break;
+                    
                 default: // text input
                     inputElement = document.createElement('input');
                     inputElement.type = 'text';
@@ -104,15 +100,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     inputElement.value = setting.value || '';
             }
             
-            // Add description if available
-            if (setting.description) {
-                const descriptionElement = document.createElement('div');
-                descriptionElement.innerHTML = formatDescription(setting);
-                inputContainer.appendChild(inputElement);
-                inputContainer.appendChild(descriptionElement);
-            } else {
-                inputContainer.appendChild(inputElement);
-            }
+            // Simply append the input element without descriptions
+            inputContainer.appendChild(inputElement);
             
             // Append everything to the form group
             formGroup.appendChild(label);
@@ -147,8 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Handle different input types
                 if (setting.type === 'boolean') {
                     value = element.checked;
-                } else if (setting.type === 'number') {
-                    value = parseFloat(element.value);
                 } else {
                     value = element.value;
                 }

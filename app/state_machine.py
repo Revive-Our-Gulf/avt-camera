@@ -13,7 +13,7 @@ class CameraState(Enum):
 class CameraStateMachine:
     def __init__(self):
         self.state = CameraState.STANDBY
-        self.trigger_mode = TriggerMode.TIME
+        self.trigger_mode = TriggerMode.DISTANCE
         self.state_lock = threading.Lock()
         print(f"Camera initialised in {self.state.name} state")
     

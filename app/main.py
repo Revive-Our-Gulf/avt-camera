@@ -5,10 +5,11 @@ from queue import Queue
 import threading
 
 from views import views_bp
-from state_machine import CameraStateMachine, CameraState
+from state_machine import TriggerMode, CameraState, CameraStateMachine
 from camera.camera_hardware_controller import CameraHardwareController
 from camera.camera_application_service import CameraApplicationService
 from detect_blur import set_focus_threshold, get_focus_threshold
+from exif_manager import ExifManager
 
 from mavlink_handler import MavlinkHandler
 import cv2
@@ -27,8 +28,10 @@ os.makedirs(base_output_dir, exist_ok=True)
 frame_save_queue = Queue(maxsize=30)
 
 state_machine = CameraStateMachine()
-camera_handler = CameraHardwareController(state_machine, frame_save_queue)
+camera_handler = CameraHardwareController(state_machine, frame_save_queue, mavlink_handler)
 camera_service = CameraApplicationService(state_machine, camera_handler, socketio)
+
+exif_manager = ExifManager(camera_service.settings_manager)
 
 
 
@@ -39,81 +42,22 @@ def generate_frames():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-def frame_saver_worker():    
-    def to_deg(value, loc):
-        if value < 0:
-            loc_value = loc[0]  # S or W
-        elif value > 0:
-            loc_value = loc[1]  # N or E
-        else:
-            loc_value = ""
-            
-        abs_value = abs(value)
-        deg = int(abs_value)
-        t1 = (abs_value-deg)*60
-        min = int(t1)
-
-        sec = (t1 - min)* 60
-        sec_multiplier = 10000
-        sec_int = int(sec * sec_multiplier)
-        
-        return ((deg, 1), (min, 1), (sec_int, sec_multiplier)), loc_value
-        
+def frame_saver_worker():
     while True:
         try:
-            image, now, frame_index = frame_save_queue.get()
+            image, now, frame_index, telemetry = frame_save_queue.get()
             timestamp = now.strftime('%Y_%m_%d_%H-%M-%S') + f'-{int(now.microsecond / 10000):02d}'
             folder = camera_service.current_recording_folder
             if folder:
                 filename = os.path.join(folder, f"IMG_{frame_index}_{timestamp}.jpg")
                 
-                telemetry = mavlink_handler.get_telemetry()
-                
                 cv2.imwrite(filename, image)
                 
                 if telemetry:
-                    exif_dict = {"0th":{}, "Exif":{}, "GPS":{}, "1st":{}, "thumbnail":None}
-                    
-                    exif_dict["0th"][piexif.ImageIFD.DateTime] = now.strftime("%Y:%m:%d %H:%M:%S")
-
-                    lat, lon, alt = None, None, None
-                    
-                    lat = float(telemetry['GLOBAL_POSITION_INT']['lat']) / 1e7
-                    lon = float(telemetry['GLOBAL_POSITION_INT']['lon']) / 1e7
-
-                    lat_deg = to_deg(lat, ["S", "N"])
-                    lon_deg = to_deg(lon, ["W", "E"])
-                    
-                    exif_dict["GPS"][piexif.GPSIFD.GPSLatitudeRef] = lat_deg[1].encode()
-                    exif_dict["GPS"][piexif.GPSIFD.GPSLongitudeRef] = lon_deg[1].encode()
-                    
-                    exif_dict["GPS"][piexif.GPSIFD.GPSLatitude] = lat_deg[0]
-                    exif_dict["GPS"][piexif.GPSIFD.GPSLongitude] = lon_deg[0]    
-                        
-                    alt = float(telemetry['GLOBAL_POSITION_INT']['relative_alt']) / 1e3   
-                    exif_dict["GPS"][piexif.GPSIFD.GPSAltitude] = (int(abs(alt) * 1000), 1000)
-                    exif_dict["GPS"][piexif.GPSIFD.GPSAltitudeRef] = 1 if alt < 0 else 0    
-
-                    satellites = telemetry['GPS_RAW_INT']['satellites_visible']
-                    exif_dict["GPS"][piexif.GPSIFD.GPSSatellites] = str(satellites).encode()
-
-                    time_in_seconds = telemetry['GLOBAL_POSITION_INT']['time_boot_ms'] // 1000
-                    hours = time_in_seconds // 3600
-                    minutes = (time_in_seconds % 3600) // 60
-                    seconds = time_in_seconds % 60
-                    exif_dict["GPS"][piexif.GPSIFD.GPSTimeStamp] = ((hours, 1), (minutes, 1), (seconds, 1))
-
-                    exif_dict["Exif"][piexif.ExifIFD.UserComment] = json.dumps({
-                        "lat": lat,
-                        "lon": lon,
-                        "alt": alt
-                    }).encode()
-
-                    exif_bytes = piexif.dump(exif_dict)        
-                    piexif.insert(exif_bytes, filename)
-
+                    exif_manager.apply_exif_to_file(filename, now, telemetry)
                     print(f"Saved frame with telemetry to {filename}")
                 else:
+                    exif_manager.apply_exif_to_file(filename, now)
                     print(f"Saved frame to {filename} (no telemetry available)")
         except Exception as e:
             print(f"Error saving frame: {e}")
@@ -190,6 +134,37 @@ def get_telemetry():
         'success': True,
         'telemetry': mavlink_handler.get_telemetry()
     })
+
+@app.route('/api/app_settings', methods=['GET'])
+def get_app_settings():
+    settings = camera_service.settings_manager.get_app_settings_definitions()
+    return jsonify({"success": True, "settings": settings.get("settings", [])})
+
+@app.route('/api/app_settings', methods=['POST'])
+def update_app_settings():
+    try:
+        data = request.get_json()
+        success, message = camera_service.settings_manager.update_app_settings(data)
+        
+        if success and 'triggering_mode' in data:
+            if data['triggering_mode'] == 'distance':
+                state_machine.trigger_mode = TriggerMode.DISTANCE
+                if 'distance_triggering' in data:
+                    mavlink_handler.set_distance_threshold(float(data['distance_triggering']))
+            else:
+                state_machine.trigger_mode = TriggerMode.TIME
+                
+        if success and 'recording_frame_rate' in data:
+            camera_handler.set_time_interval(1.0 / float(data['recording_frame_rate']))
+            
+        if success and 'preview_frame_rate' in data:
+            camera_handler.set_preview_interval(1.0 / float(data['preview_frame_rate']))
+        
+        return jsonify({"success": success, "message": message})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+
 
 
 if __name__ == '__main__':
