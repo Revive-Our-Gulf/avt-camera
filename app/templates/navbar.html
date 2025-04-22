@@ -11,16 +11,19 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/cockpit">Cockpit</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/parameters">Parameters</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="/files">Files</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/preview">Preview</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Settings
+                </a>
+                <div class="dropdown-menu" aria-labelledby="settingsDropdown">
+                    <a class="dropdown-item" href="/parameters">Camera</a>
+                    <a class="dropdown-item" href="/app_settings">Application</a>
+                </div>
             </li>
         </ul>
     </div>

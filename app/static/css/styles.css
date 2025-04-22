@@ -53,6 +53,7 @@ body {
     align-items: center; /* Center the stream vertically */
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 .stream {
@@ -60,6 +61,7 @@ body {
     height: 100%;
     object-fit: contain; /* Maintains aspect ratio while filling the container */
     object-position: center; /* Center the stream image if it doesn't fill entirely */
+    object-fit: contain;
 }
 
 .custom-shadow {
@@ -71,4 +73,10 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.read-only-input {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.8;
 }

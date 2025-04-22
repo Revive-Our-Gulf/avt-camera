@@ -1,41 +1,98 @@
 {% extends "base.html" %}
 {% set include_navbar = true %}
 
-{% block title %}Home - RTSP Server{% endblock %}
+{% block title %}Home - AVT Camera{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <img id="live_feed" src="" alt="Live Feed" class="img-fluid mb-2"/>
-    </div>
-</div>
-<div class="row streamRow">
-    <div class="d-flex" role="toolbar" aria-label="Toolbar with button groups">
-        <div class="input-group">
-            <button type="button" class="btn btn-primary" id="setNameButton" onclick="setTransectName()">
-                <i class="fa fa-save"></i>
-            </button>
-            <input type="text" id="folderName" class="form-control mr-2" placeholder="Transect Name">
-            <button type="button" class="btn btn-success" id="recordButton" onclick="toggleRecording()">Start</button>
-        </div>
-        
-        
-    
-        <div class="btn-group">
-            <button id="parametersButton" class="btn btn-secondary" onclick="window.open('/parameters', '_blank')">
-                <i class="fas fa-cogs"></i>
-            </button>
-            <button type="button" class="btn btn-danger" onclick="restartPipeline()">
-                <i class="fa fa-power-off"></i>
-            </button>
-        </div>
-    </div>
-</div>
-{% endblock %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="text-center mb-4">AVT Camera System</h1>
+                    <p class="lead text-center">
+                        Welcome to the Allied Vision Technologies (AVT) camera control system.
+                    </p>
+                    <hr>
+                    <div class="mt-4">
+                        <h4><i class="fa fa-info-circle text-primary"></i> About</h4>
+                        <p>
+                            This application provides a web interface to control AVT cameras, manage recording sessions, and access camera settings.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-{% block extra_scripts %}
-<script src="{{ url_for('static', filename='javascript/parameters.js') }}"></script>
-<script src="{{ url_for('static', filename='javascript/transect.js') }}"></script>
-<script src="{{ url_for('static', filename='javascript/record.js') }}"></script>
-<script src="{{ url_for('static', filename='javascript/status.js') }}"></script>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4><i class="fa fa-cogs text-primary"></i> Key Features</h4>
+                    <ul class="list-group list-group-flush mt-2">
+                        <li class="list-group-item">
+                            <i class="fa fa-camera text-muted"></i> Live camera preview
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-play text-muted"></i> Record video in WRITE mode
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-eye text-muted"></i> Preview mode for setup
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-sliders text-muted"></i> Adjust camera parameters
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-file text-muted"></i> Access recorded files
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4><i class="fa fa-question-circle text-primary"></i> Getting Started</h4>
+                    <div class="alert alert-info mt-3">
+                        <h5><i class="fa fa-video"></i> Basic Operation</h5>
+                        <ol>
+                            <li>Go to <a href="/cockpit">Cockpit</a> to access the main camera interface</li>
+                            <li>Click <i class="fa fa-eye"></i> to enter preview mode</li>
+                            <li>Enter a folder name where recordings will be saved</li>
+                            <li>Click <i class="fa fa-play text-danger"></i> to start recording</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4><i class="fa fa-link text-primary"></i> Quick Links</h4>
+                    <div class="row mt-3 text-center">
+                        <div class="col-md-3 mb-3">
+                            <a href="/cockpit" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="fa fa-tachometer"></i><br>Cockpit
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/preview" class="btn btn-outline-success btn-lg w-100">
+                                <i class="fa fa-eye"></i><br>Preview
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/files" class="btn btn-outline-info btn-lg w-100">
+                                <i class="fa fa-folder"></i><br>Files
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/parameters" class="btn btn-outline-secondary btn-lg w-100">
+                                <i class="fa fa-cog"></i><br>Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4 text-muted">
+                <small>For technical issues, please contact system administrator</small>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

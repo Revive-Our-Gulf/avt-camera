@@ -1,100 +1,212 @@
-// static/parameters.js
-var socket = io();
-
-function updateParameters() {
-    if (!validateForm()) {
-        return false;
-    }
-
-
-    var form = document.getElementById('parametersForm');
-    var formData = new FormData(form);
-    var data = {};
-
-    formData.forEach((value, key) => {
-        data[key] = value;
-    });
-
-    // Display a message saying parameters updated
-    alert('Parameters updated.');
-
-    socket.emit('update_parameters', data);
-}
-
-function resetParameters() {
-    socket.emit('reset_parameters');
-}
-
-socket.on('parameters_updated', function(updatedParameters) {
-    for (var param_name in updatedParameters) {
-        if (updatedParameters.hasOwnProperty(param_name)) {
-            var param = updatedParameters[param_name];
-            var input = document.getElementById(param_name);
-            var currentValueSpan = document.getElementById(param_name + '_current_value');
-
-            if (input.tagName === 'SELECT') {
-                input.value = param;
-            } else {
-                input.value = param;
+document.addEventListener('DOMContentLoaded', function() {
+    const parametersContainer = document.getElementById('parametersContainer');
+    let parameterDefinitions = [];
+    
+    // Fetch parameter definitions
+    fetch('/api/camera/parameters')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                parameterDefinitions = data.parameters;
+                // Generate form based on parameters
+                generateParameterTable(parameterDefinitions);
+                
+                // Then fetch current values
+                return fetch('/api/camera/settings');
             }
-
-            if (currentValueSpan) {
-                currentValueSpan.textContent = param;
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Camera settings response:", data);
+            if (data.success) {
+                // Update form values with current settings
+                for (const param of parameterDefinitions) {
+                    const element = document.getElementById(param.id);
+                    const currentValueSpan = document.getElementById(`current-${param.id}`);
+                    
+                    if (element && data.settings[param.id] !== undefined) {
+                        console.log(`Setting ${param.id} = ${data.settings[param.id]}`);
+                        element.value = data.settings[param.id];
+                        
+                        if (currentValueSpan) {
+                            currentValueSpan.textContent = data.settings[param.id];
+                        }
+                    }
+                }
             }
-        }
-    }
-});
-
-socket.on('parameters_reset', function(message) {
-    alert(message.message);
-    location.reload();
-});
-
-function restartPipeline() {
-    socket.emit('restart_pipeline');
-}
-
-function toggleStrobe() {
-    socket.emit('get_strobe_state');
-}
-
-socket.on('strobe_state', function(data) {
-    const newValue = data.value === 'Off' ? 'ExposureActive' : 'Off';
+        })
+        .catch(error => {
+            console.error('Error loading parameters:', error);
+        });
     
-    const updateData = {
-        'LineSource+Line2': newValue
-    };
-    
-    socket.emit('update_parameters', updateData);
-});
-
-function validateForm() {
-    let isValid = true;
-    const inputs = document.querySelectorAll('#parametersForm input[type="number"]');
-    
-    inputs.forEach(input => {
-        const value = parseFloat(input.value);
-        const min = input.hasAttribute('min') ? parseFloat(input.getAttribute('min')) : null;
-        const max = input.hasAttribute('max') ? parseFloat(input.getAttribute('max')) : null;
+    // Function to generate table-based parameter form
+    function generateParameterTable(parameters) {
+        parametersContainer.innerHTML = ''; // Clear loading spinner
         
-        // Reset previous error styling
-        input.classList.remove('is-invalid');
+        // Create table structure
+        const table = document.createElement('table');
+        table.className = 'table table-sm table-striped table-hover';
         
-        // Check if value is outside bounds
-        if ((min !== null && value < min) || (max !== null && value > max)) {
-            input.classList.add('is-invalid');
-            isValid = false;
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const nameHeader = document.createElement('th');
+        nameHeader.textContent = 'Parameter';
+        
+        const currentHeader = document.createElement('th');
+        currentHeader.textContent = 'Current Value';
+        
+        const newValueHeader = document.createElement('th');
+        newValueHeader.textContent = 'New Value';
+        
+        headerRow.appendChild(nameHeader);
+        headerRow.appendChild(currentHeader);
+        headerRow.appendChild(newValueHeader);
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        for (const param of parameters) {
+            const row = document.createElement('tr');
             
-            // Create or update error message
-            let errorMsg = input.nextElementSibling;
-            if (!errorMsg || !errorMsg.classList.contains('invalid-feedback')) {
-                errorMsg = document.createElement('div');
-                errorMsg.className = 'invalid-feedback';
-                input.parentNode.appendChild(errorMsg);
+            // Parameter name cell
+            const nameCell = document.createElement('td');
+            nameCell.textContent = param.name + (param.unit ? ` (${param.unit})` : '');
+            nameCell.className = 'align-middle';
+            
+            // Current value cell
+            const currentValueCell = document.createElement('td');
+            const currentValue = document.createElement('span');
+            currentValue.id = `current-${param.id}`;
+            currentValue.className = 'current-value';
+            currentValue.textContent = '...';
+            currentValueCell.appendChild(currentValue);
+            currentValueCell.className = 'align-middle';
+            
+            // New value (input) cell
+            const inputCell = document.createElement('td');
+            
+            // Create input element based on type
+            let inputElement;
+            
+            if (param.type === 'select') {
+                inputElement = document.createElement('select');
+                inputElement.className = 'form-control form-control-sm';
+                
+                for (const option of param.options) {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    inputElement.appendChild(optionElement);
+                }
+            } else if (param.type === 'number') {
+                inputElement = document.createElement('input');
+                inputElement.type = 'number';
+                inputElement.className = 'form-control form-control-sm';
+                if (param.min !== undefined) inputElement.min = param.min;
+                if (param.max !== undefined) inputElement.max = param.max;
+                
+                inputElement.step = param.increment !== undefined ? param.increment : "any";
+                inputElement.value = param.default;
+            } else {
+                // Default to text input
+                inputElement = document.createElement('input');
+                inputElement.type = 'text';
+                inputElement.className = 'form-control form-control-sm';
+                inputElement.value = param.default || '';
             }
-            errorMsg.textContent = `Value must be between ${min || '-∞'} and ${max || '∞'}`;
+            
+            // Set common attributes
+            inputElement.id = param.id;
+            inputElement.name = param.id;
+            
+            // Make input read-only if not writeable
+            if (param.writeable === false) {
+                inputElement.disabled = true;
+                inputElement.classList.add('read-only-input');
+            }
+            
+            inputCell.appendChild(inputElement);
+            
+            // Add cells to row
+            row.appendChild(nameCell);
+            row.appendChild(currentValueCell);
+            row.appendChild(inputCell);
+            
+            // Add row to table body
+            tbody.appendChild(row);
         }
+        
+        table.appendChild(tbody);
+        parametersContainer.appendChild(table);
+    
+    }
+    
+    document.getElementById('cameraSettingsForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form from submitting normally
+        applySettings();
     });
     
-    return isValid;
-}
+    // Function to apply settings to camera
+    function applySettings() {
+        const settings = {};
+        
+        // Collect all input values
+        for (const param of parameterDefinitions) {
+            if (param.writeable !== false) {
+                const element = document.getElementById(param.id);
+                if (element) {
+                    let value = element.value;
+                    
+                    // Convert to number if type is number
+                    if (param.type === 'number') {
+                        value = parseFloat(value);
+                    }
+                    
+                    settings[param.id] = value;
+                }
+            }
+        }
+        
+        console.log('Applying settings:', settings);
+        
+        // Send settings to server
+        fetch('/api/camera/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settings)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Settings applied:', data);
+            
+            const statusDiv = document.getElementById('statusMessage');
+            if (data.success) {
+                statusDiv.className = 'alert alert-success mt-3';
+                statusDiv.textContent = 'Settings applied successfully';
+            } else {
+                statusDiv.className = 'alert alert-danger mt-3';
+                statusDiv.textContent = 'Error applying settings: ' + data.message;
+            }
+            
+            statusDiv.style.display = 'block';
+            
+            // Hide status after 3 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = 'alert alert-danger mt-3';
+            statusDiv.textContent = 'Error applying settings';
+            statusDiv.style.display = 'block';
+        });
+    }
+});

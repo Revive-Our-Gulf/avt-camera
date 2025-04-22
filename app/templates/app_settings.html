@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% set include_navbar = true %}
+
+{% block title %}Application Settings - RTSP Server{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Application Settings</h2>
+    <form id="appSettingsForm">
+        <div id="settingsContainer">
+            <!-- Settings will be dynamically inserted here -->
+            <div class="text-center mt-4">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary mt-3">Save Settings</button>
+    </form>
+    <div id="statusMessage" class="alert mt-3" style="display: none;"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='javascript/app_settings.js') }}"></script>
+{% endblock %}
