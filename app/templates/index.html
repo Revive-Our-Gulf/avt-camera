@@ -9,21 +9,53 @@
         <div class="col-lg-8 mx-auto">
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <h1 class="text-center mb-4">AVT Camera System</h1>
-                    <p class="lead text-center">
-                        Welcome to the Allied Vision Technologies (AVT) camera control system.
-                    </p>
+                    <h1 class="text-center mb-4">Revive Our Gulf - Benthic Camera Software</h1>
                     <hr>
                     <div class="mt-4">
                         <h4><i class="fa fa-info-circle text-primary"></i> About</h4>
                         <p>
-                            This application provides a web interface to control AVT cameras, manage recording sessions, and access camera settings.
+                            This application provides a web interface to control the AVT camera, manage recordings, and access camera settings.
                         </p>
                     </div>
                 </div>
             </div>
 
             <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4><i class="fa fa-question-circle text-primary"></i> Getting Started</h4>
+                    <div class="alert alert-primary mt-3">
+                        <h5><i class="fa fa-plug"></i> BlueOS Cockpit Integration</h5>
+                        <p>
+                            To integrate the AVT camera feed into the BlueOS cockpit, follow these steps:
+                        </p>
+                        <ol>
+                            <li>Navigate to the BlueOS cockpit widgets</li>
+                            <li>Add a new iframe widget.</li>
+                            <li>Set the iframe source URL to: <code>http://camera.local/cockpit</code>.</li>
+                            <li>Adjust the dimensions as needed for optimal display.</li>
+                        </ol>
+                    </div>
+                    <div class="alert alert-info mt-3">
+                        <h5><i class="fa fa-video"></i> Basic Operation</h5>
+                        <p>
+                            The AVT camera operates in three modes: <strong>Standby</strong>, <strong>Preview</strong>, and <strong>Recording</strong>.
+                        </p>
+                        <ul>
+                            <li><strong>Standby Mode:</strong> The last captured frame is displayed, and the camera is idle.</li>
+                            <li><strong>Preview Mode:</strong> The camera streams the down camera using the configured stream resolution, but no data is saved.</li>
+                            <li><strong>Recording Mode:</strong> The camera saves full-resolution JPEG images in a folder named <code>{date}_{time}_{transect_name}</code>.</li>
+                        </ul>
+                        <ol class="mt-3">
+                            <li>Click <i class="fa fa-eye"></i> to enter preview mode.</li>
+                            <li>Enter the transect name into the entry field where recordings will be saved.</li>
+                            <li>Click <i class="fa fa-circle text-danger"></i> to start recording.</li>
+                            <li>Click <i class="fa fa-stop text-danger"></i> to stop recording. This will also stop the preview mode.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h4><i class="fa fa-cogs text-primary"></i> Key Features</h4>
                     <ul class="list-group list-group-flush mt-2">
@@ -46,48 +78,35 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h4><i class="fa fa-question-circle text-primary"></i> Getting Started</h4>
-                    <div class="alert alert-info mt-3">
-                        <h5><i class="fa fa-video"></i> Basic Operation</h5>
-                        <ol>
-                            <li>Go to <a href="/cockpit">Cockpit</a> to access the main camera interface</li>
-                            <li>Click <i class="fa fa-eye"></i> to enter preview mode</li>
-                            <li>Enter a folder name where recordings will be saved</li>
-                            <li>Click <i class="fa fa-play text-danger"></i> to start recording</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
+            
 
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h4><i class="fa fa-link text-primary"></i> Quick Links</h4>
                     <div class="row mt-3 text-center">
                         <div class="col-md-3 mb-3">
-                            <a href="/cockpit" class="btn btn-outline-primary btn-lg w-100">
+                            <a href="/cockpit" class="btn btn-outline-dark btn-lg w-100">
                                 <i class="fa fa-tachometer"></i><br>Cockpit
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="/preview" class="btn btn-outline-success btn-lg w-100">
+                            <a href="/preview" class="btn btn-outline-dark btn-lg w-100">
                                 <i class="fa fa-eye"></i><br>Preview
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="/files" class="btn btn-outline-info btn-lg w-100">
+                            <a href="/files" class="btn btn-outline-dark btn-lg w-100">
                                 <i class="fa fa-folder"></i><br>Files
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="/parameters" class="btn btn-outline-secondary btn-lg w-100">
+                            <a href="/parameters" class="btn btn-outline-dark btn-lg w-100">
                                 <i class="fa fa-cog"></i><br>Settings
                             </a>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <div class="text-center mt-4 text-muted">
                 <small>For technical issues, please contact system administrator</small>

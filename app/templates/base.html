@@ -5,10 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>{% block title %}RTSP Server{% endblock %}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/minimal-fa.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/copy-snackbar.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+        <script>
+            window.MissingSourceMapsWarningDisabled = true;
+        </script>
 
         <script src="{{ url_for('static', filename='javascript/bootstrap/jquery-slim.min.js') }}"></script>
         <script src="{{ url_for('static', filename='javascript/bootstrap/popper.min.js') }}"></script>

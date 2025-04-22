@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% set include_navbar = false %}
 
-{% block title %}Home - RTSP Server{% endblock %}
+{% block title %}Preview - AVT Camera{% endblock %}
 
 {% block content %}
 <div class="d-flex flex-column vh-100">
     <!-- Top Toolbar -->
     <div class="toolbar">
         <div class="input-group">
-            <button id="focusModeButton" class="btn btn-primary" onclick="toggleFocusMode()">
-                <i class="fas fa-camera-retro"></i>
+            <button id="focusModeButton" class="btn btn-dark" onclick="toggleFocusMode()">
+                <i class="fa fa-camera-retro"></i>
             </button>
             <button class="btn btn-dark" onclick="setState('PREVIEW')"><i class="fa fa-eye"></i></button>
             <input type="text" id="folderNameInput" class="form-control bg-secondary text-white border-secondary" placeholder="Folder Name">
-            <button class="btn btn-danger" onclick="setState('WRITE')"><i class="fa fa-play"></i></button>
+            <button class="btn btn-dark" onclick="setState('WRITE')"><i class="fa fa-play"></i></button>
             <button type="button" class="btn btn-dark" onclick="window.open('/files', '_blank')"><i class="fa fa-folder"></i></button>
             <button type="button" class="btn btn-dark" onclick="window.open('/parameters', '_blank')"><i class="fa fa-cog"></i></button>
         </div>

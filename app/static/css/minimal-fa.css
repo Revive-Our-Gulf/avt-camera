@@ -1,0 +1,166 @@
+/* Base Font Awesome setup - required */
+.fa {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+}
+
+.fa::before {
+    content: var(--fa);
+}
+
+/* Only the icons you actually use */
+.fa-camera-retro {
+    --fa: "\f083";
+}
+
+.fa-eye {
+    --fa: "\f06e";
+}
+
+.fa-play {
+    --fa: "\f04b";
+}
+
+.fa-folder {
+    --fa: "\f07b";
+}
+
+.fa-cog {
+    --fa: "\f013";
+}
+
+.fa-circle {
+    --fa: "\f111";
+}
+
+.fa-square {
+    --fa: "\f0c8";
+}
+
+.fa-stop {
+    --fa: "\f04d";
+}
+
+.fa-info-circle {
+    --fa: "\f05a";
+}
+
+.fa-camera {
+    --fa: "\f030";
+}
+
+.fa-sliders {
+    --fa: "\f1de";
+}
+
+.fa-file {
+    --fa: "\f15b";
+}
+
+.fa-video {
+    --fa: "\f03d";
+}
+
+.fa-link {
+    --fa: "\f0c1";
+}
+
+.fa-tachometer {
+    --fa: "\f62a";
+}
+
+.fa-home {
+    --fa: "\f015";
+}
+
+.fa-bars {
+    --fa: "\f0c9";
+}
+
+.fa-user {
+    --fa: "\f007";
+}
+
+.fa-search {
+    --fa: "\f002";
+}
+
+.fa-plus {
+    --fa: "\2b";
+}
+
+.fa-minus {
+    --fa: "\f068";
+}
+
+.fa-times {
+    --fa: "\f00d";
+}
+
+.fa-check {
+    --fa: "\f00c";
+}
+
+.fa-upload {
+    --fa: "\f093";
+}
+
+.fa-download {
+    --fa: "\f019";
+}
+
+.fa-refresh {
+    --fa: "\f021";
+}
+
+.fa-pause {
+    --fa: "\f04c";
+}
+
+.fa-forward {
+    --fa: "\f04e";
+}
+
+.fa-backward {
+    --fa: "\f04a";
+}
+
+.fa-arrow-left {
+    --fa: "\f060";
+}
+
+.fa-arrow-right {
+    --fa: "\f061";
+}
+
+.fa-chevron-left {
+    --fa: "\f053";
+}
+
+.fa-chevron-right {
+    --fa: "\f054";
+}
+
+.fa-chevron-up {
+    --fa: "\f077";
+}
+
+.fa-chevron-down {
+    --fa: "\f078";
+}
+
+/* Font declarations - required */
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    font-style: normal;
+    font-weight: 900;
+    font-display: block;
+    src: url("../webfonts/fa-solid-900.woff2") format("woff2"), url("../webfonts/fa-solid-900.ttf") format("truetype");
+}

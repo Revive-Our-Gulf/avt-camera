@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set include_navbar = false %}
 
-{% block title %}Home - RTSP Server{% endblock %}
+{% block title %}Cockpit - AVT Camera{% endblock %}
 
 {% block content %}
 <div class="d-flex flex-column vh-100">
@@ -11,7 +11,7 @@
             <button class="btn btn-dark" onclick="setState('PREVIEW')"><i class="fa fa-eye"></i></button>
             <input type="text" id="folderNameInput" class="form-control bg-secondary text-white border-secondary" placeholder="Folder Name">
             <button class="btn btn-danger" onclick="setState('WRITE')"><i class="fa fa-play"></i></button>
-            <button type="button" class="btn btn-dark" onclick="window.open('/parameters', '_blank')"><i class="fa fa-cog"></i></button>
+            <button type="button" class="btn btn-dark" onclick="window.open('/parameters', '_blank')"><i class="fa fa-sliders"></i></button>
         </div>
     </div>
 

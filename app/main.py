@@ -155,7 +155,11 @@ def update_app_settings():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
-
+@app.after_request
+def add_header(response):
+    if 'static/' in request.path:
+        response.cache_control.max_age = 86400  # 1 day in seconds
+    return response
 
 
 if __name__ == '__main__':
