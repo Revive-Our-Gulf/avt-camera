@@ -7,52 +7,56 @@
 <div class="container my-4">
     <div class="row">
         <div class="col-lg-8 mx-auto">
-            <div class="card shadow-sm mb-4">
+            <!-- <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <h1 class="text-center mb-4">Revive Our Gulf - Benthic Camera Software</h1>
-                    <hr>
-                    <div class="mt-4">
-                        <h4><i class="fa fa-info-circle text-primary"></i> About</h4>
-                        <p>
-                            This application provides a web interface to control the AVT camera, manage recordings, and access camera settings.
-                        </p>
-                    </div>
+                    <h1 class="text-center mb-4">Revive Our Gulf - Benthic Camera Software</h1>                    
                 </div>
-            </div>
+            </div> -->
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <h4><i class="fa fa-question-circle text-primary"></i> Getting Started</h4>
+                    <h4><i class="fa fa-question-circle"></i> Getting Started</h4>
                     <div class="alert alert-primary mt-3">
-                        <h5><i class="fa fa-plug"></i> BlueOS Cockpit Integration</h5>
+                        <h5>How to setup</h5>
                         <p>
-                            To integrate the AVT camera feed into the BlueOS cockpit, follow these steps:
+                            To integrate the camera feed into the BlueOS Cockpit extension:
                         </p>
                         <ol>
-                            <li>Navigate to the BlueOS cockpit widgets</li>
+                            <li>In Cockpit go to 'Edit Interface'.</li>
+                            <li>Select the 'Regular' widget type in the widgets menu.</li>
                             <li>Add a new iframe widget.</li>
                             <li>Set the iframe source URL to: <code>http://camera.local/cockpit</code>.</li>
                             <li>Adjust the dimensions as needed for optimal display.</li>
                         </ol>
                     </div>
-                    <div class="alert alert-info mt-3">
-                        <h5><i class="fa fa-video"></i> Basic Operation</h5>
-                        <p>
+                    <div class="alert alert-secondary mt-3">
+                        <h5></i>How to use</h5>
+                        <!-- <p>
                             The AVT camera operates in three modes: <strong>Standby</strong>, <strong>Preview</strong>, and <strong>Recording</strong>.
-                        </p>
-                        <ul>
+                        </p> -->
+                        <!-- <ul>
                             <li><strong>Standby Mode:</strong> The last captured frame is displayed, and the camera is idle.</li>
                             <li><strong>Preview Mode:</strong> The camera streams the down camera using the configured stream resolution, but no data is saved.</li>
                             <li><strong>Recording Mode:</strong> The camera saves full-resolution JPEG images in a folder named <code>{date}_{time}_{transect_name}</code>.</li>
-                        </ul>
+                        </ul> -->
                         <ol class="mt-3">
-                            <li>Click <i class="fa fa-eye"></i> to enter preview mode.</li>
-                            <li>Enter the transect name into the entry field where recordings will be saved.</li>
-                            <li>Click <i class="fa fa-circle text-danger"></i> to start recording.</li>
-                            <li>Click <i class="fa fa-stop text-danger"></i> to stop recording. This will also stop the preview mode.</li>
+                            <li>To preview the images coming from the camera click <i class="fa fa-eye"></i></li>
+                            <li>To record images enter a folder name and then click <i class="fa fa-circle text-danger"></i> to begin recording</li>
+                            <li>To stop recording click <i class="fa fa-stop text-danger"></i>.</li>
+                            <li>To retrieve images click <i class="fa fa-cog"></i> and then navigate to <a href="/files">Files</a> in the navbar</li>
                         </ol>
                     </div>
                 </div>
+            </div>
+
+            <div class="card-body text-center">
+                <a href="https://github.com/Revive-Our-Gulf/avt-camera" target="_blank">Software</a> |
+                <a href="" target="_blank">Privacy Policy</a> |
+                <a href="" target="_blank">User Agreement</a>
+            </div>
+            <hr>
+            <div class="text-center text-muted">
+                <small>Revive Our Gulf (c) 2025. BenthicCamera Software V1.0.0</small>
             </div>
 
             <!-- <div class="card shadow-sm mb-4">
@@ -108,9 +112,7 @@
                 </div>
             </div> -->
 
-            <div class="text-center mt-4 text-muted">
-                <small>For technical issues, please contact system administrator</small>
-            </div>
+            
         </div>
     </div>
 </div>
