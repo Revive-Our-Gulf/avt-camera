@@ -46,7 +46,6 @@ def frame_saver_worker():
     while True:
         try:
             image, now, frame_index, telemetry = frame_save_queue.get()
-            # print(f"Timestamp: {now}, frame_index: {frame_index}, telemetry: {telemetry}")
             timestamp = now.strftime('%Y_%m_%d_%H-%M-%S') + f'-{int(now.microsecond / 10000):02d}'
             folder = camera_service.current_recording_folder
             if folder:
@@ -54,12 +53,15 @@ def frame_saver_worker():
                 
                 cv2.imwrite(filename, image)
                 
-                if telemetry and telemetry != {}:
+                app_settings = camera_service.settings_manager.get_app_settings()
+                include_telemetry = app_settings.get('exif_telemetry', False)
+                
+                if include_telemetry and telemetry and telemetry != {}:
                     exif_manager.apply_exif_to_file(filename, now, telemetry)
                     print(f"Saved frame with telemetry to {filename}")
                 else:
                     exif_manager.apply_exif_to_file(filename, now)
-                    print(f"Saved frame to {filename} (no telemetry available)")
+                    print(f"Saved frame without telemetry to {filename}")
         except Exception as e:
             print(f"Error saving frame: {e}")
             import traceback
@@ -160,6 +162,23 @@ def add_header(response):
     if 'static/' in request.path:
         response.cache_control.max_age = 86400  # 1 day in seconds
     return response
+
+@app.route('/api/remote_pi_time', methods=['GET'])
+def get_remote_pi_time():
+    try:
+        time_diff = mavlink_handler.get_remote_pi_time_diff()
+        print(time_diff)
+        return jsonify(time_diff)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/sync_system_time', methods=['POST'])
+def sync_system_time():
+    try:
+        mavlink_handler.sync_system_time()
+        return jsonify({"success": True, "message": "System time synchronized"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 
 if __name__ == '__main__':

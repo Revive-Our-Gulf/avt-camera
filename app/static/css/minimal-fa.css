@@ -156,6 +156,18 @@
     --fa: "\f078";
 }
 
+.fa-question-circle {
+    --fa: "\f059";
+}
+
+.fa-github {
+    --fa: "\f09b";
+}
+
+.fa-sync {
+    --fa: "\f021";
+}
+
 /* Font declarations - required */
 @font-face {
     font-family: 'Font Awesome 6 Free';

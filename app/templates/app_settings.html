@@ -5,7 +5,10 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Application Settings</h2>
+    <h2>Application Settings</h2>   
+
+    <div id="statusMessage" class="alert mt-3" style="display: none;"></div> 
+
     <form id="appSettingsForm">
         <div id="settingsContainer">
             <!-- Settings will be dynamically inserted here -->
@@ -18,10 +21,20 @@
         
         <button type="submit" class="btn btn-primary mt-3">Save Settings</button>
     </form>
-    <div id="statusMessage" class="alert mt-3" style="display: none;"></div>
+    
+    <div class="mt-4">
+        <p>
+            <button id="refresh-time-btn" class="btn btn-sm btn-secondary">
+                <i class="fa fa-sync"></i>
+            </button>
+            <span id="remote-pi-diff">Loading...</span>
+            
+        </p>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='javascript/app_settings.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/time_sync.js') }}"></script>
 {% endblock %}

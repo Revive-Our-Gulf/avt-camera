@@ -86,9 +86,19 @@ class CameraHardwareController:
             if self.focus_mode:
                 image = variance_of_laplacian(image)
 
-            # image_stream = cv2.resize(image, (1028, 752), interpolation=cv2.INTER_AREA)
-            image_stream = image
+            app_settings = self.settings_manager.get_app_settings()
+            stream_resolution = app_settings.get('preview_resolution', '1028x752')
 
+            try:
+                width, height = map(int, stream_resolution.split('x'))
+                # Only resize if the dimensions are different from the original
+                if width != image.shape[1] or height != image.shape[0]:
+                    image_stream = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+                else:
+                    image_stream = image
+            except (ValueError, AttributeError):
+                print(f"Invalid resolution format: {stream_resolution}")
+                image_stream = image
         
             _, jpeg = cv2.imencode('.jpg', image_stream)
             with self.frame_lock:

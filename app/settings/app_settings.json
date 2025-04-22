@@ -36,9 +36,9 @@
         },
         {
             "id": "preview_resolution",
-            "name": "Preview Resolution (Width x Height)",
+            "name": "Stream Resolution (Width x Height)",
             "type": "enum",
-            "value": "4112x3008",
+            "value": "512x376",
             "options": [
                 "4112x3008",
                 "2056x1504",
@@ -48,9 +48,9 @@
         },
         {
             "id": "exif_telemetry",
-            "name": "EXIF Encoding Telemetry Option",
+            "name": "Encode Telemetry in EXIF",
             "type": "boolean",
-            "value": false
+            "value": true
         }
     ]
 }
