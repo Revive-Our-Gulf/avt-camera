@@ -2,6 +2,8 @@
 
 sudo cp avt-camera.service /etc/systemd/system/
 
+sudo systemctl stop avt-camera.service
+
 sudo systemctl daemon-reload
 sudo systemctl enable avt-camera.service
 

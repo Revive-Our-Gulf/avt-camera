@@ -4,7 +4,6 @@ import cv2
 import functools
 from datetime import datetime
 from vmbpy import Camera, Stream, Frame, FrameStatus, VmbFeatureError, PixelFormat, VmbSystem
-from detect_blur import variance_of_laplacian
 from settings_manager import SettingsManager
 import numpy as np
 from state_machine import CameraState, TriggerMode
@@ -17,7 +16,6 @@ class CameraHardwareController:
         self.camera_lock = threading.Lock()
         self.frame_buffer = None
         self.frame_lock = threading.Lock()
-        self.focus_mode = False
         self.settings_manager = SettingsManager()
         self.mavlink_handler = mavlink_handler
 
@@ -52,10 +50,6 @@ class CameraHardwareController:
             return wrapper
         return decorator
 
-    def toggle_focus_mode(self):
-        self.focus_mode = not self.focus_mode
-        return self.focus_mode
-
     def setup_camera(self, cam):
         self.load_saved_settings()
         cam.TriggerSource.set('Software')
@@ -82,9 +76,6 @@ class CameraHardwareController:
             
             if image.dtype == np.uint16:
                 image = (image / 16).astype(np.uint8)
-            
-            if self.focus_mode:
-                image = variance_of_laplacian(image)
 
             app_settings = self.settings_manager.get_app_settings()
             stream_resolution = app_settings.get('preview_resolution', '1028x752')

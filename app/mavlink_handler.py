@@ -132,19 +132,44 @@ class MavlinkHandler:
         try:
             if "SYSTEM_TIME" in self.telemetry_data:
                 unix_time_us = self.telemetry_data["SYSTEM_TIME"]["time_unix_usec"]
-                
                 unix_time_sec = unix_time_us / 1000000
                 time_str = datetime.fromtimestamp(unix_time_sec).strftime('%Y-%m-%d %H:%M:%S')
                 
                 print(f"Syncing system time to: {time_str}")
                 
-                result = os.system(f'sudo date -s "{time_str}"')
+                # Run the date command to set the system time locally
+                result = subprocess.run(['/usr/bin/sudo', 'date', '-s', time_str], check=False)
                 
-                if result == 0:
+                if result.returncode == 0:
                     print("System time synchronized successfully")
                 else:
-                    print(f"Failed to set system time, error code: {result}")
+                    print(f"Failed to set system time, error code: {result.returncode}")
                     
+                    # Attempt to get the time from remote Pi (192.168.2.2) via SSH
+                    print("Attempting to get time from remote Pi (192.168.2.2) via SSH...")
+                    try:
+                        ssh_cmd = ["/usr/bin/ssh", "pi@192.168.2.2", "date +'%Y-%m-%d %H:%M:%S'"]
+                        remote_time_output = subprocess.check_output(ssh_cmd, text=True).strip()
+                        
+                        if remote_time_output:
+                            print(f"Remote Pi time retrieved: {remote_time_output}")
+                            # Now, set the time on the local Pi (192.168.2.3) using the retrieved time
+                            set_time_cmd = ['/usr/bin/sudo', 'date', '-s', remote_time_output]
+                            set_result = subprocess.run(set_time_cmd, check=False)
+                            
+                            if set_result.returncode == 0:
+                                print(f"Local Pi time synchronized to remote Pi's time: {remote_time_output}")
+                            else:
+                                print(f"Failed to set local Pi time with remote Pi's time. Error: {set_result.returncode}")
+                        else:
+                            print("Failed to retrieve time from remote Pi.")
+                    
+                    except subprocess.CalledProcessError as ssh_error:
+                        print(f"SSH command failed: {ssh_error}")
+                    except Exception as e:
+                        print(f"Error syncing with remote Pi: {e}")
+                    
+                    # Calculate and print the time difference if the sync fails
                     time_diff = unix_time_sec - time.time()
                     print(f"Time difference: {time_diff:.2f} seconds")
                     
@@ -154,10 +179,11 @@ class MavlinkHandler:
     def get_remote_pi_time_diff(self, remote_pi="pi@192.168.2.2"):
         """Get time difference between local Pi and remote Pi"""
         try:
-            ssh_cmd = f"ssh {remote_pi} 'date +%s.%N'"
-            remote_time_output = subprocess.check_output(ssh_cmd, shell=True, text=True).strip()
+            # Make sure to specify full path to `ssh` command
+            ssh_cmd = ["/usr/bin/ssh", remote_pi, "date +%s.%N"]
+            remote_time_output = subprocess.check_output(ssh_cmd, text=True).strip()
+
             remote_time_sec = float(remote_time_output)
-            
             local_time = time.time()
 
             time_diff = remote_time_sec - local_time

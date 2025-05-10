@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             previewButton.querySelector('i').className = 'fa fa-eye';
             
             recordButton.className = 'btn btn-dark';
-            recordButton.querySelector('i').className = 'fa fa-play';
+            recordButton.querySelector('i').className = 'fa fa-circle text-danger';
             
         } else if (state === 'WRITE' && previewButton && recordButton) {
             recordButton.className = 'btn btn-danger';

@@ -8,7 +8,6 @@ from views import views_bp
 from state_machine import TriggerMode, CameraState, CameraStateMachine
 from camera.camera_hardware_controller import CameraHardwareController
 from camera.camera_application_service import CameraApplicationService
-from detect_blur import set_focus_threshold, get_focus_threshold
 from exif_manager import ExifManager
 
 from mavlink_handler import MavlinkHandler
@@ -16,6 +15,9 @@ import cv2
 import piexif
 import json
 from datetime import datetime
+
+import subprocess
+import time
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -34,6 +36,31 @@ camera_service = CameraApplicationService(state_machine, camera_handler, socketi
 exif_manager = ExifManager(camera_service.settings_manager)
 
 camera_service.settings_manager.apply_current_app_settings(state_machine, camera_handler, mavlink_handler)
+
+def modify_mtu():
+    try:
+        # Check if MTU is already set to 9000
+        result = subprocess.run(['/usr/sbin/ip', 'link', 'show', 'eth0'], capture_output=True, text=True, check=True)
+        if 'mtu 9000' in result.stdout:
+            print("MTU is already set to 9000 for eth0")
+            return
+        
+        print("Bringing down the network interface eth0")
+        subprocess.run(['/usr/bin/sudo', 'ip', 'link', 'set', 'eth0', 'down'], check=True)
+        
+        print("Setting MTU to 9000 for eth0")
+        subprocess.run(['/usr/bin/sudo', 'ip', 'link', 'set', 'eth0', 'mtu', '9000'], check=True)
+        
+        print("Bringing up the network interface eth0")
+        subprocess.run(['/usr/bin/sudo', 'ip', 'link', 'set', 'eth0', 'up'], check=True)
+        
+        print("Waiting for the network interface to stabilize")
+        time.sleep(10)
+        
+        print("MTU modification completed successfully")
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while running sudo commands: {e}")
+        exit(1)
 
 def generate_frames():
     while True:
@@ -111,26 +138,6 @@ def update_camera_settings():
     result = camera_service.update_camera_settings(data)
     return jsonify(result)
     
-@app.route('/api/toggle_focus_mode', methods=['POST'])
-def toggle_focus_mode():
-    focus_mode = camera_handler.toggle_focus_mode()
-    return jsonify({'success': True, 'focus_mode_enabled': focus_mode})
-
-@app.route('/api/focus/tolerance', methods=['GET', 'POST'])
-def focus_tolerance():
-    if request.method == 'POST':
-        data = request.get_json()
-        threshold = data.get('threshold', 30)
-        
-        if threshold < 10 or threshold > 100:
-            return jsonify({'success': False, 'error': 'Threshold must be between 10 and 100'})
-            
-        new_threshold = set_focus_threshold(threshold)
-        return jsonify({'success': True, 'threshold': new_threshold})
-    else:
-        current_threshold = get_focus_threshold()
-        return jsonify({'success': True, 'threshold': current_threshold})
-    
 @app.route('/api/telemetry', methods=['GET'])
 def get_telemetry():
     return jsonify({
@@ -182,7 +189,8 @@ def sync_system_time():
 
 
 if __name__ == '__main__':
+    modify_mtu()
     threading.Thread(target=frame_saver_worker, daemon=True).start()
     mavlink_handler.start_mavlink_thread()
     camera_handler.start_camera_thread()
-    socketio.run(app, host='0.0.0.0', port=80, debug=True, use_reloader=False)
+    socketio.run(app, host='0.0.0.0', port=80, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)

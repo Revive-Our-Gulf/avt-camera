@@ -3,13 +3,16 @@ Description=AVT Camera Flask Application Service
 After=network.target
 
 [Service]
+WorkingDirectory=/home/pi/Repos/avt-camera
 User=pi
 Group=pi
+Environment="PATH=/home/pi/Repos/avt-camera/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="VIMBA_HOME=/opt/Vimba_6_0/VimbaC/"
 Environment="GENICAM_GENTL64_PATH=/opt/Vimba_6_0/VimbaGigETL/CTI/arm_64bit:/opt/VimbaX_2024-1/cti"
 Environment="GST_PLUGIN_PATH=/usr/local/lib/gstreamer-1.0"
+Environment="PATH=/home/pi/Repos/avt-camera/venv/bin:$PATH"
 ExecStartPre=/bin/sleep 30
-ExecStart=/home/pi/Repos/avt-camera/venv/bin/python3 /home/pi/Repos/avt-camera/app/main.py
+ExecStart=/usr/bin/authbind --deep /home/pi/Repos/avt-camera/venv/bin/python3 /home/pi/Repos/avt-camera/app/main.py
 Restart=always
 
 [Install]

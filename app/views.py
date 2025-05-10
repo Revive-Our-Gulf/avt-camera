@@ -26,5 +26,3 @@ def parameters():
 def app_settings_page():
     return render_template('app_settings.html')
 
-focus_mode_enabled = False
-

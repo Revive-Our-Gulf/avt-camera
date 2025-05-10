@@ -6,7 +6,7 @@
             "type": "number",
             "unit": "\u03bcs",
             "default": 2000.0,
-            "value": 1000.929,
+            "value": 1987.596,
             "min": 300.0,
             "max": 50000.0,
             "writeable": true
@@ -16,12 +16,32 @@
             "name": "Exposure Auto",
             "type": "select",
             "default": "Off",
-            "value": "Off",
+            "value": "Continuous",
             "options": [
                 "Off",
                 "Once",
                 "Continuous"
             ],
+            "writeable": true
+        },
+        {
+            "id": "AutoExposureMin",
+            "name": "Auto Exposure Min",
+            "type": "number",
+            "default": 500.0,
+            "value": 500,
+            "min": 300.0,
+            "max": 50000.0,
+            "writeable": true
+        },
+        {
+            "id": "AutoExposureMax",
+            "name": "Auto Exposure Max",
+            "type": "number",
+            "default": 2000.0,
+            "value": 2000,
+            "min": 300.0,
+            "max": 50000.0,
             "writeable": true
         },
         {
