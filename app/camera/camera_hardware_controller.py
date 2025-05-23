@@ -122,18 +122,21 @@ class CameraHardwareController:
         with VmbSystem.get_instance() as vmb:
             while retry_count < max_retries:
                 try:
+                    print(f"Attempt {retry_count+1}: Trying to access camera in Full mode...")
                     camera = self._find_camera(vmb)
                     if not camera:
                         print("No cameras found! Retrying in 5 seconds...")
+                        self.state_machine.set_camera_available(False)
                         time.sleep(retry_delay)
                         retry_count += 1
                         continue
                         
-                    print(f"Attempt {retry_count+1}: Trying to access camera in Full mode...")
+                    
                     self._run_camera_loop(camera)
                     break
                     
                 except Exception as e:
+                    self.state_machine.set_camera_available(False)
                     retry_count += 1
                     if "invalid Mode 'AccessMode.Full'" in str(e):
                         print(f"Camera not available in Full mode (attempt {retry_count}/{max_retries})")
@@ -163,7 +166,8 @@ class CameraHardwareController:
 
                 self.setup_camera(camera)
                 camera.start_streaming(self.frame_handler)
-                self._process_frames(camera)
+                self.state_machine.set_camera_available(True)
+                self._process_frames(camera) 
             finally:
                 camera.stop_streaming()
                 with self.camera_lock:

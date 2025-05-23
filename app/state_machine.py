@@ -6,13 +6,14 @@ class TriggerMode(Enum):
     DISTANCE = auto()
     
 class CameraState(Enum):
+    UNAVAILABLE = auto()
     STANDBY = auto()
     PREVIEW = auto()
     WRITE = auto()
-
+    
 class CameraStateMachine:
     def __init__(self):
-        self.state = CameraState.STANDBY
+        self.state = CameraState.UNAVAILABLE
         self.trigger_mode = TriggerMode.TIME
         self.state_lock = threading.Lock()
         print(f"Camera initialised in {self.state.name} state")
@@ -41,11 +42,27 @@ class CameraStateMachine:
     
     def toggle_state(self, new_state):
         current_state = self.get_state()
+
+        if current_state == CameraState.UNAVAILABLE:
+            print("Cannot toggle state: Camera is unavailable")
+            return False
         
         if current_state == new_state:
             return self.transition_to(CameraState.STANDBY)
         else:
             return self.transition_to(new_state)
+        
+    def set_camera_available(self, available=True):
+        """Mark the camera as available or unavailable"""
+        if available and self.get_state() == CameraState.UNAVAILABLE:
+            return self.transition_to(CameraState.STANDBY)
+        elif not available and self.get_state() != CameraState.UNAVAILABLE:
+            return self.transition_to(CameraState.UNAVAILABLE)
+        return False
+    
+    def is_available(self):
+        with self.state_lock:
+            return self.state != CameraState.UNAVAILABLE
 
     def set_trigger_mode(self, mode):
         with self.state_lock:
