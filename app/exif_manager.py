@@ -121,17 +121,20 @@ class ExifManager:
             print(f"Temperature: {temperature}°C")
             exif_dict['Exif'][piexif.ExifIFD.Temperature] = (int(temperature * 100), 100)
 
-            serializable_telemetry = {}
-            for key, value in telemetry.items():
-                if isinstance(value, dict):
-                    serializable_telemetry[key] = value
-                else:
-                    try:
-                        serializable_telemetry[key] = value.to_dict()
-                    except:
-                        serializable_telemetry[key] = str(value)
+            serialisable_telemetry = {
+                'latitude': lat,
+                'longitude': lon,
+                'heading': telemetry['GLOBAL_POSITION_INT']['hdg'] / 1e2,
+                'depth': telemetry['GLOBAL_POSITION_INT']['relative_alt'] / 1e2,
+                'waterTemp': temperature,
+                'driveMode': telemetry['HEARTBEAT']['custom_mode'],
+                'gpsSatellites': telemetry['GPS_RAW_INT']['satellites_visible'],
+                'gpsHDOP:': telemetry['GPS_RAW_INT']['eph'] / 1e2,
+                'gpsHAccuracy': telemetry['GPS_RAW_INT']['h_acc'],
+                'dvlDistance': telemetry['RANGEFINDER']['distance']
+            }
                         
-            exif_dict["Exif"][piexif.ExifIFD.UserComment] = json.dumps(serializable_telemetry).encode()
+            exif_dict["Exif"][piexif.ExifIFD.UserComment] = json.dumps(serialisable_telemetry).encode()
             
         except Exception as e:
             print(f"Error adding GPS data to EXIF: {e}")
