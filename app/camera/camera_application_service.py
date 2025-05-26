@@ -17,6 +17,12 @@ class CameraApplicationService:
     
     def change_state(self, new_state, folder_name=None):
         current_state = self.state_machine.get_state()
+        if current_state == CameraState.UNAVAILABLE:
+            if self.socketio:
+                self.socketio.emit('camera_error', {'message': 'Camera is currently unavailable'})
+            return False
+    
+
         if new_state == CameraState.WRITE and current_state != CameraState.WRITE:
             self.set_recording_folder(folder_name)
             self.camera_hardware_controller.frame_index = 0

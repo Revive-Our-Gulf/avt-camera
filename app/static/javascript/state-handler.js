@@ -24,9 +24,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (recordButton) {
             recordButton.className = 'btn btn-dark';
             recordButton.querySelector('i').className = 'fa fa-circle text-danger';
+            recordButton.disabled = false;
         }
         
-        if (state === 'PREVIEW' && previewButton && recordButton) {
+        if (state === 'UNAVAILABLE') {
+            if (previewButton) previewButton.disabled = true;
+            if (recordButton) recordButton.disabled = true;
+        
+        } else if (state === 'PREVIEW' && previewButton && recordButton) {
             previewButton.className = 'btn btn-warning';
             previewButton.querySelector('i').className = 'fa fa-eye';
             
