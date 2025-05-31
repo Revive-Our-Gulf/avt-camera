@@ -33,7 +33,7 @@ state_machine = CameraStateMachine()
 camera_handler = CameraHardwareController(state_machine, frame_save_queue, mavlink_handler)
 camera_service = CameraApplicationService(state_machine, camera_handler, socketio)
 
-exif_manager = ExifManager(camera_service.settings_manager)
+exif_manager = ExifManager(camera_service.settings_manager, camera_handler)
 
 camera_service.settings_manager.apply_current_app_settings(state_machine, camera_handler, mavlink_handler)
 
@@ -187,9 +187,93 @@ def sync_system_time():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
+@app.route('/api/camera_settings', methods=['GET'])
+def get_camera_hardware_settings():  # Renamed from get_camera_settings
+    try:
+        settings = camera_handler.get_camera_settings()  # Use instance method, not class method
+        for key, value in settings.items():
+            if hasattr(value, '__str__'):
+                settings[key] = str(value)
+        return jsonify({"success": True, "settings": settings})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+    
+@app.route('/api/camera/settings/progressive', methods=['POST'])
+def apply_camera_settings_progressive():
+    try:
+        settings = request.json
+        if not settings:
+            return jsonify({"success": False, "message": "No settings provided"})
+        
+        # Start a background task to process settings
+        socketio.start_background_task(
+            apply_settings_progressively, settings
+        )
+        
+        return jsonify({"success": True, "message": "Settings application started"})
+    except Exception as e:
+        print(f"Error starting progressive settings application: {e}")
+        return jsonify({"success": False, "message": str(e)})
+
+def apply_settings_progressively(settings):
+    try:
+        settings_list = []
+        
+        # Convert dictionary to list of items with id
+        for key, value in settings.items():
+            # Get parameter name from definitions (fallback to key if not found)
+            param_name = key
+            
+            # Fix: Use get_parameters_definitions() instead of non-existent get_params()
+            for param in camera_service.settings_manager.get_parameters_definitions().get("parameters", []):
+                if param.get('id') == key:
+                    param_name = param.get('name', key)
+                    break
+                
+            settings_list.append({
+                'id': key,
+                'name': param_name,
+                'value': value
+            })
+        
+        # Apply each setting individually
+        for setting in settings_list:  
+            time.sleep(0.1)          
+            try:
+                # Apply single setting - FIX: use apply_specific_settings instead of apply_settings
+                single_setting = {setting['id']: setting['value']}
+                camera_handler.apply_specific_settings(single_setting)
+                
+                # Emit progress update
+                socketio.emit('setting_applied', {
+                    'id': setting['id'],
+                    'name': setting['name'],
+                    'value': setting['value']
+                })
+            except Exception as e:
+                print(f"Error applying setting {setting['id']}: {e}")
+                socketio.emit('settings_error', {
+                    'message': f"Error applying {setting['name']}: {str(e)}"
+                })
+                return
+        
+        # All settings applied successfully
+        socketio.emit('settings_complete', {
+            'message': 'All settings applied successfully'
+        })
+    except Exception as e:
+        print(f"Error in progressive settings application: {e}")
+        socketio.emit('settings_error', {
+            'message': str(e)
+        })
+        
+@app.route('/<path:path>.map')
+def handle_source_maps(path):
+    # Return 204 No Content for source map requests
+    return '', 204
 
 if __name__ == '__main__':
-    modify_mtu()
+    # modify_mtu()
     threading.Thread(target=frame_saver_worker, daemon=True).start()
     mavlink_handler.start_mavlink_thread()
     camera_handler.start_camera_thread()
