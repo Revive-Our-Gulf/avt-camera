@@ -5,18 +5,43 @@
 
 {% block content %}
 <div class="d-flex flex-column vh-100">
+    <div class="bg-dark p-1 text-white d-flex justify-content-around">
+        <div>
+            <strong>Exposure:</strong> <span id="exposureTime">--</span> μs
+        </div>
+        <div>
+            <strong>Auto:</strong> <span id="exposureAuto">--</span>
+        </div>
+        <div>
+            <strong>Strobe:</strong> <span id="strobe">--</span>
+        </div>
+    </div>
     <!-- Top Toolbar -->
     <div class="toolbar">
         <div class="input-group">
             <button class="btn btn-dark" onclick="setState('PREVIEW')"><i class="fa fa-eye"></i></button>
-            <input type="text" id="folderNameInput" class="form-control bg-secondary text-white border-secondary" placeholder="Folder Name">
+            <input type="text" id="folderNameInput" class="form-control bg-secondary text-white border-secondary"
+                placeholder="Folder Name">
             <button class="btn btn-danger" onclick="setState('WRITE')"><i class="fa fa-circle"></i></button>
-            <button type="button" class="btn btn-dark" onclick="window.open('/', '_blank')"><i class="fa fa-cog"></i></button>
+            <button type="button" class="btn btn-dark" onclick="window.open('/', '_blank')"><i
+                    class="fa fa-cog"></i></button>
         </div>
     </div>
+    
 
     <div class="stream-container">
         <img id="live_feed" src="/video_feed" class="stream" alt="Live Feed">
+
+        <div id="stream-loading" class="position-absolute top-0 start-0 w-100 h-100 d-none">
+            <div class="d-flex justify-content-center align-items-center h-100 bg-dark bg-opacity-75">
+                <div class="text-center text-white">
+                    <div class="spinner-border mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div id="loading-message">Initializing camera...</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -25,4 +50,5 @@
 <script src="{{ url_for('static', filename='javascript/camera.js') }}"></script>
 <script src="{{ url_for('static', filename='javascript/transect.js') }}"></script>
 <script src="{{ url_for('static', filename='javascript/state-handler.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/camera_settings.js') }}"></script>
 {% endblock %}

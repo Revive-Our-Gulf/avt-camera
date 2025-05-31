@@ -1,5 +1,17 @@
 const socket = io();
 
+function getState() {
+    return fetch('/api/state')
+        .then(response => response.json())
+        .then(data => {
+            return data.state;
+        })
+        .catch(error => {
+            console.error('Error fetching camera state:', error);
+            return null;
+        });
+}
+
 // Add reconnection handler
 socket.on('connect', function() {
     console.log('Socket connected/reconnected, refreshing state');
