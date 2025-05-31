@@ -97,6 +97,9 @@ class ExifManager:
         line_source = self._get_string_value(current_settings, "LineSource")
         exif_dict["Exif"][piexif.ExifIFD.Flash] = 0 if line_source == "Off" else 1
         
+        white_balance_auto = self._get_string_value(current_settings, "BalanceWhiteAuto")
+        exif_dict["Exif"][piexif.ExifIFD.WhiteBalance] = 0 if white_balance_auto == "Continuous" else 1
+        
         if telemetry:
             self._add_gps_data(exif_dict, telemetry)
             
