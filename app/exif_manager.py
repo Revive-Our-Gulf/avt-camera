@@ -4,8 +4,9 @@ import piexif
 from datetime import datetime
 
 class ExifManager:
-    def __init__(self, settings_manager):
+    def __init__(self, settings_manager, camera_hardware_controller=None):
         self.settings_manager = settings_manager
+        self.camera_hardware_controller = camera_hardware_controller
         self.exif_settings_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), 
             'settings', 
@@ -26,6 +27,13 @@ class ExifManager:
                 "exposure": {}, 
                 "other": {}
             }
+            
+    def _get_string_value(self, settings, key):
+        """Extract string value from setting which might be an EnumEntry object"""
+        value = settings.get(key)
+        if hasattr(value, '__str__'):
+            return str(value)
+        return value
     
     def to_deg(self, value, loc):
         """Convert decimal coordinates to degrees format for EXIF."""
@@ -53,8 +61,11 @@ class ExifManager:
 
         current_settings = {}
         try:
-            params_list = self.settings_manager.get_parameters_definitions()["parameters"]
-            current_settings = {param["id"]: param["value"] for param in params_list}
+            if self.camera_hardware_controller:
+                current_settings = self.camera_hardware_controller.get_camera_settings()
+            else:
+                params_list = self.settings_manager.get_parameters_definitions()["parameters"]
+                current_settings = {param["id"]: param["value"] for param in params_list}
         except Exception as e:
             print(f"Could not get current camera settings: {e}")
             
@@ -74,11 +85,17 @@ class ExifManager:
         exif_dict["Exif"][piexif.ExifIFD.FocalLength] = tuple(lens.get("FocalLength", [1, 100]))
         exif_dict["Exif"][piexif.ExifIFD.ApertureValue] = tuple(lens.get("MaxApertureValue", [1, 100]))
         
+        # Handle exposure time
+        exposure_time = current_settings.get("ExposureTime", 0)
+        exif_dict["Exif"][piexif.ExifIFD.ExposureTime] = (int(exposure_time), 1000000)
+        
+        # Handle exposure mode - convert EnumEntry to string if needed
+        exposure_auto = self._get_string_value(current_settings, "ExposureAuto")
+        exif_dict["Exif"][piexif.ExifIFD.ExposureMode] = 0 if exposure_auto == "Continuous" else 1 
 
-        exif_dict["Exif"][piexif.ExifIFD.ExposureTime] = (int(current_settings["ExposureTime"]), 1000000)
-        exif_dict["Exif"][piexif.ExifIFD.ExposureMode] = 0 if current_settings["ExposureAuto"] == "Auto" else 1 
-
-        exif_dict["Exif"][piexif.ExifIFD.Flash] = 0 if current_settings["LineSource"] == "Off" else 1
+        # Handle flash - convert EnumEntry to string if needed
+        line_source = self._get_string_value(current_settings, "LineSource")
+        exif_dict["Exif"][piexif.ExifIFD.Flash] = 0 if line_source == "Off" else 1
         
         if telemetry:
             self._add_gps_data(exif_dict, telemetry)
@@ -121,18 +138,27 @@ class ExifManager:
             print(f"Temperature: {temperature}°C")
             exif_dict['Exif'][piexif.ExifIFD.Temperature] = (int(temperature * 100), 100)
 
+            dvlDistance = -1
+            try:
+                dvlDistance = telemetry['RANGEFINDER']['distance']
+            except Exception as e:
+                print(f"Error retrieving DVL distance: {e}")
+                
+
             serialisable_telemetry = {
                 'latitude': lat,
                 'longitude': lon,
                 'heading': telemetry['GLOBAL_POSITION_INT']['hdg'] / 1e2,
-                'depth': telemetry['GLOBAL_POSITION_INT']['relative_alt'] / 1e2,
+                'depth': telemetry['GLOBAL_POSITION_INT']['relative_alt'] / 1e3,
                 'waterTemp': temperature,
                 'driveMode': telemetry['HEARTBEAT']['custom_mode'],
                 'gpsSatellites': telemetry['GPS_RAW_INT']['satellites_visible'],
                 'gpsHDOP:': telemetry['GPS_RAW_INT']['eph'] / 1e2,
                 'gpsHAccuracy': telemetry['GPS_RAW_INT']['h_acc'],
-                'dvlDistance': telemetry['RANGEFINDER']['distance']
+                'dvlDistance': dvlDistance
             }
+            
+            print(f"Serialisable Telemetry: {serialisable_telemetry}")
                         
             exif_dict["Exif"][piexif.ExifIFD.UserComment] = json.dumps(serialisable_telemetry).encode()
             
