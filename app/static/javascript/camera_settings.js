@@ -9,8 +9,13 @@ function updateSettings() {
         .then(data => {
             if (data.success) {
                 console.log('Camera settings updated:', data.settings);
-                document.getElementById('exposureTime').textContent = data.settings.ExposureTime;
-                document.getElementById('exposureAuto').textContent = data.settings.ExposureAuto;
+                document.getElementById('exposureTime').textContent = (parseInt(data.settings.ExposureTime, 10) / 1000).toFixed(2);
+                if (data.settings.ExposureAuto == "Continuous") {
+                    document.getElementById('exposureAuto').textContent = 'On';
+                }
+                else {
+                    document.getElementById('exposureAuto').textContent = 'Off';
+                }
                 if (data.settings.LineSource == "ExposureActive") {
                     document.getElementById('strobe').textContent = 'On';
                 } else {
