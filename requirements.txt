@@ -1,8 +1,8 @@
 Flask
 flask_socketio
-pygobject==3.42.2
+pygobject==3.42.2; platform_system != "Windows"
 https://github.com/alliedvision/VmbPy/releases/download/1.0.5/vmbpy-1.0.5-py3-none-any.whl
-git+https://github.com/jackersson/gstreamer-python.git
+git+https://github.com/jackersson/gstreamer-python.git; platform_system != "Windows"
 opencv-python
 Pillow
 pymavlink
