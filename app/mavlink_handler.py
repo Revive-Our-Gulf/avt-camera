@@ -14,6 +14,9 @@ class MavlinkHandler:
         self.telemetry_data = {}
         self.reconnect_delay = 3
         self.heartbeat_timeout = 10
+        self.telemetry_stale_after = 3
+        self.connected = False
+        self.last_message_time = 0.0
 
         self.last_photo_position = None
         self.distance_threshold = 1.0
@@ -35,12 +38,14 @@ class MavlinkHandler:
                 print("Starting MAVLink connection...")
                 self.connection = mavutil.mavlink_connection('udpin:0.0.0.0:14570')
                 self.connection.wait_heartbeat(timeout=self.heartbeat_timeout)
+                self.connected = True
                 print("MAVLink connection established")
 
                 while self.running:
                     msg = self.connection.recv_match(blocking=True, timeout=1.0)
 
                     if msg:
+                        self.last_message_time = time.time()
                         msg_type = msg.get_type()
                         self.telemetry_data[msg_type] = msg.to_dict()
 
@@ -51,8 +56,10 @@ class MavlinkHandler:
                             self._process_position_update(self.telemetry_data[msg_type])
 
             except Exception as e:
+                self.connected = False
                 print(f"MAVLink connection lost/error: {e}")
             finally:
+                self.connected = False
                 if self.connection:
                     self.connection.close()
                     self.connection = None
@@ -63,6 +70,22 @@ class MavlinkHandler:
             
     def get_telemetry(self):
         return self.telemetry_data
+
+    def get_connection_status(self):
+        now = time.time()
+        age_seconds = None
+        is_stale = True
+
+        if self.last_message_time > 0:
+            age_seconds = round(now - self.last_message_time, 2)
+            is_stale = age_seconds > self.telemetry_stale_after
+
+        return {
+            "connected": self.connected,
+            "is_stale": is_stale,
+            "last_message_age_seconds": age_seconds,
+            "telemetry_stale_after_seconds": self.telemetry_stale_after
+        }
     
     def set_distance_threshold(self, meters):
         self.distance_threshold = float(meters)

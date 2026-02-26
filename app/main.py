@@ -145,6 +145,13 @@ def get_telemetry():
         'telemetry': mavlink_handler.get_telemetry()
     })
 
+@app.route('/api/mavlink/status', methods=['GET'])
+def get_mavlink_status():
+    return jsonify({
+        'success': True,
+        'status': mavlink_handler.get_connection_status()
+    })
+
 @app.route('/api/app_settings', methods=['GET'])
 def get_app_settings():
     settings = camera_service.settings_manager.get_app_settings_definitions()
