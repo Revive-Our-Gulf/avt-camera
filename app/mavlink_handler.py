@@ -12,6 +12,8 @@ class MavlinkHandler:
         self.connection = None
         self.running = False
         self.telemetry_data = {}
+        self.reconnect_delay = 3
+        self.heartbeat_timeout = 10
 
         self.last_photo_position = None
         self.distance_threshold = 1.0
@@ -28,40 +30,36 @@ class MavlinkHandler:
         
     def _mavlink_thread(self):
         self.running = True
-        try:
-            print("Starting MAVLink connection...")
-            self.connection = mavutil.mavlink_connection(f'udpin:0.0.0.0:14570')
-            self.connection.wait_heartbeat()
-            print("MAVLink connection established")
-            
-            while self.running:
-                msg = self.connection.recv_match(blocking=True, timeout=1.0)
+        while self.running:
+            try:
+                print("Starting MAVLink connection...")
+                self.connection = mavutil.mavlink_connection('udpin:0.0.0.0:14570')
+                self.connection.wait_heartbeat(timeout=self.heartbeat_timeout)
+                print("MAVLink connection established")
 
-                if msg:
-                    msg_type = msg.get_type()
-                    self.telemetry_data[msg_type] = msg.to_dict()
+                while self.running:
+                    msg = self.connection.recv_match(blocking=True, timeout=1.0)
 
-                    if msg_type == "SYSTEM_TIME":
-                        self.check_and_sync_system_time()
+                    if msg:
+                        msg_type = msg.get_type()
+                        self.telemetry_data[msg_type] = msg.to_dict()
 
-                    if msg_type == "GLOBAL_POSITION_INT":
-                        self._process_position_update(self.telemetry_data[msg_type])
+                        if msg_type == "SYSTEM_TIME":
+                            self.check_and_sync_system_time()
 
-                    # if msg_type == "GPS_RAW_INT":
-                    #     gps_raw_time = self.telemetry_data[msg_type]["time_usec"]
-                    #     gps_time = datetime.fromtimestamp(gps_raw_time / 1e6).strftime('%Y-%m-%d %H:%M:%S')
+                        if msg_type == "GLOBAL_POSITION_INT":
+                            self._process_position_update(self.telemetry_data[msg_type])
 
-                    #     system_time = self.telemetry_data["SYSTEM_TIME"]["time_unix_usec"]
-                    #     system_time_str = datetime.fromtimestamp(system_time / 1e6).strftime('%Y-%m-%d %H:%M:%S')
+            except Exception as e:
+                print(f"MAVLink connection lost/error: {e}")
+            finally:
+                if self.connection:
+                    self.connection.close()
+                    self.connection = None
 
-                    #     time_diff = (gps_raw_time - system_time) / 1e6
-                    #     print(f"GPS Time: {gps_time}, System Time: {system_time_str}, Time Difference: {time_diff:.2f} seconds")
-                    
-        except Exception as e:
-            print(f"MAVLink thread error: {e}")
-        finally:
-            if self.connection:
-                self.connection.close()
+            if self.running:
+                print(f"Retrying MAVLink connection in {self.reconnect_delay} seconds...")
+                time.sleep(self.reconnect_delay)
             
     def get_telemetry(self):
         return self.telemetry_data
