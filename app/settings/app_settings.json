@@ -38,7 +38,7 @@
             "id": "preview_resolution",
             "name": "Stream Resolution (Width x Height)",
             "type": "enum",
-            "value": "512x376",
+            "value": "1028x752",
             "options": [
                 "4112x3008",
                 "2056x1504",
