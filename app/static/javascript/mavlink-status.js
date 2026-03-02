@@ -29,26 +29,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         hearts.forEach((heart) => {
+            if (!statusData.connected) {
+                heart.classList.remove('fa-heart', 'text-white', 'text-warning');
+                heart.classList.add('fa-heart-crack', 'text-danger');
+                return;
+            }
+
+            if (statusData.is_stale) {
+                heart.classList.remove('fa-heart', 'text-white', 'text-danger');
+                heart.classList.add('fa-heart-crack', 'text-warning');
+                return;
+            }
+
             if (statusData.connected && !statusData.is_stale) {
                 heart.classList.remove('fa-heart-crack');
                 heart.classList.add('fa-heart');
                 heart.classList.remove('text-danger', 'text-warning');
                 heart.classList.add('text-white');
-                return;
             }
-
-            if (statusData.connected && statusData.is_stale) {
-                heart.classList.remove('fa-heart');
-                heart.classList.add('fa-heart-crack');
-                heart.classList.remove('text-white', 'text-danger');
-                heart.classList.add('text-warning');
-                return;
-            }
-
-            heart.classList.remove('fa-heart');
-            heart.classList.add('fa-heart-crack');
-            heart.classList.remove('text-white', 'text-warning');
-            heart.classList.add('text-danger');
         });
     }
 
