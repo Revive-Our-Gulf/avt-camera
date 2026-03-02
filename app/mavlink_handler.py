@@ -74,11 +74,11 @@ class MavlinkHandler:
     def get_connection_status(self):
         now = time.time()
         age_seconds = None
-        is_stale = True
+        is_stale = False
 
         if self.last_message_time > 0:
             age_seconds = round(now - self.last_message_time, 2)
-            is_stale = age_seconds > self.telemetry_stale_after
+            is_stale = self.connected and age_seconds > self.telemetry_stale_after
 
         return {
             "connected": self.connected,
