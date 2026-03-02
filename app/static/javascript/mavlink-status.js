@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (statusData.last_message_age_seconds !== null) {
                 badge.textContent = `${statusData.last_message_age_seconds}s`;
             } else {
-                badge.textContent = '--s';
+                badge.textContent = '';
             }
         });
     }

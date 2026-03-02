@@ -75,18 +75,16 @@ class MavlinkHandler:
         now = time.time()
         age_seconds = None
         is_stale = False
+        has_messages = self.last_message_time > 0
+        is_connected = self.connected and has_messages
 
-        if self.connected:
-            if self.last_message_time > 0:
-                age_seconds = round(now - self.last_message_time, 2)
-                is_stale = age_seconds > self.telemetry_stale_after
-            else:
-                is_stale = True
-        elif self.last_message_time > 0:
+        if has_messages:
             age_seconds = round(now - self.last_message_time, 2)
+            if is_connected:
+                is_stale = age_seconds > self.telemetry_stale_after
 
         return {
-            "connected": self.connected,
+            "connected": is_connected,
             "is_stale": is_stale,
             "last_message_age_seconds": age_seconds,
             "telemetry_stale_after_seconds": self.telemetry_stale_after
