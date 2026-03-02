@@ -14,25 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         badges.forEach((badge) => {
-            badge.className = 'badge';
-
-            if (!statusData.connected) {
-                badge.classList.add('bg-danger');
-                badge.textContent = 'Disconnected';
-                return;
-            }
-
-            if (statusData.is_stale) {
-                badge.classList.add('bg-warning', 'text-dark');
-                badge.textContent = 'Stale';
-                return;
-            }
-
-            badge.classList.add('bg-success');
             if (statusData.last_message_age_seconds !== null) {
-                badge.textContent = `Connected (${statusData.last_message_age_seconds}s)`;
+                badge.textContent = `${statusData.last_message_age_seconds}s`;
             } else {
-                badge.textContent = 'Connected';
+                badge.textContent = '--s';
             }
         });
     }
@@ -47,14 +32,22 @@ document.addEventListener('DOMContentLoaded', function () {
             if (statusData.connected && !statusData.is_stale) {
                 heart.classList.remove('fa-heart-crack');
                 heart.classList.add('fa-heart');
-                heart.classList.remove('text-danger');
+                heart.classList.remove('text-danger', 'text-warning');
                 heart.classList.add('text-white');
+                return;
+            }
+
+            if (statusData.connected && statusData.is_stale) {
+                heart.classList.remove('fa-heart');
+                heart.classList.add('fa-heart-crack');
+                heart.classList.remove('text-white', 'text-danger');
+                heart.classList.add('text-warning');
                 return;
             }
 
             heart.classList.remove('fa-heart');
             heart.classList.add('fa-heart-crack');
-            heart.classList.remove('text-white');
+            heart.classList.remove('text-white', 'text-warning');
             heart.classList.add('text-danger');
         });
     }
