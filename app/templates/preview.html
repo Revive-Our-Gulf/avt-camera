@@ -12,6 +12,9 @@
             <input type="text" id="folderNameInput" class="form-control bg-secondary text-white border-secondary" placeholder="Folder Name">
             <button class="btn btn-dark" onclick="setState('WRITE')"><i class="fa fa-play"></i></button>
             <button type="button" class="btn btn-dark" onclick="window.open('/files', '_blank')"><i class="fa fa-folder"></i></button>
+            <span class="btn btn-dark d-flex align-items-center" aria-label="MAVLink connection status">
+                <i data-mavlink-heart class="fa fa-heart-crack h5 mb-0 text-danger" aria-label="MAVLink connection status"></i>
+            </span>
             <button type="button" class="btn btn-dark" onclick="window.open('/parameters', '_blank')"><i class="fa fa-cog"></i></button>
         </div>
     </div>

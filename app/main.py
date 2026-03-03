@@ -145,6 +145,12 @@ def get_telemetry():
         'telemetry': mavlink_handler.get_telemetry()
     })
 
+@app.route('/api/mavlink/status', methods=['GET'])
+def get_mavlink_status():
+    return jsonify({
+        'success': True,
+        'status': mavlink_handler.get_connection_status()
+      
 @app.route('/api/server_time', methods=['GET'])
 def get_server_time():
     now = datetime.now().astimezone()

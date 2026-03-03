@@ -12,6 +12,11 @@ class MavlinkHandler:
         self.connection = None
         self.running = False
         self.telemetry_data = {}
+        self.reconnect_delay = 3
+        self.heartbeat_timeout = 10
+        self.telemetry_stale_after = 3
+        self.connected = False
+        self.last_message_time = 0.0
 
         self.last_photo_position = None
         self.distance_threshold = 1.0
@@ -28,43 +33,62 @@ class MavlinkHandler:
         
     def _mavlink_thread(self):
         self.running = True
-        try:
-            print("Starting MAVLink connection...")
-            self.connection = mavutil.mavlink_connection(f'udpin:0.0.0.0:14570')
-            self.connection.wait_heartbeat()
-            print("MAVLink connection established")
-            
-            while self.running:
-                msg = self.connection.recv_match(blocking=True, timeout=1.0)
+        while self.running:
+            try:
+                print("Starting MAVLink connection...")
+                self.connection = mavutil.mavlink_connection('udpin:0.0.0.0:14570')
+                self.connection.wait_heartbeat(timeout=self.heartbeat_timeout)
+                self.connected = True
+                print("MAVLink connection established")
 
-                if msg:
-                    msg_type = msg.get_type()
-                    self.telemetry_data[msg_type] = msg.to_dict()
+                while self.running:
+                    msg = self.connection.recv_match(blocking=True, timeout=1.0)
 
-                    if msg_type == "SYSTEM_TIME":
-                        self.check_and_sync_system_time()
+                    if msg:
+                        self.last_message_time = time.time()
+                        msg_type = msg.get_type()
+                        self.telemetry_data[msg_type] = msg.to_dict()
 
-                    if msg_type == "GLOBAL_POSITION_INT":
-                        self._process_position_update(self.telemetry_data[msg_type])
+                        if msg_type == "SYSTEM_TIME":
+                            self.check_and_sync_system_time()
 
-                    # if msg_type == "GPS_RAW_INT":
-                    #     gps_raw_time = self.telemetry_data[msg_type]["time_usec"]
-                    #     gps_time = datetime.fromtimestamp(gps_raw_time / 1e6).strftime('%Y-%m-%d %H:%M:%S')
+                        if msg_type == "GLOBAL_POSITION_INT":
+                            self._process_position_update(self.telemetry_data[msg_type])
 
-                    #     system_time = self.telemetry_data["SYSTEM_TIME"]["time_unix_usec"]
-                    #     system_time_str = datetime.fromtimestamp(system_time / 1e6).strftime('%Y-%m-%d %H:%M:%S')
+            except Exception as e:
+                self.connected = False
+                print(f"MAVLink connection lost/error: {e}")
+            finally:
+                self.connected = False
+                if self.connection:
+                    self.connection.close()
+                    self.connection = None
 
-                    #     time_diff = (gps_raw_time - system_time) / 1e6
-                    #     print(f"GPS Time: {gps_time}, System Time: {system_time_str}, Time Difference: {time_diff:.2f} seconds")
-                    
-        except Exception as e:
-            print(f"MAVLink thread error: {e}")
-        finally:
-            if self.connection:
-                self.connection.close()
+            if self.running:
+                print(f"Retrying MAVLink connection in {self.reconnect_delay} seconds...")
+                time.sleep(self.reconnect_delay)
             
     def get_telemetry(self):
         return self.telemetry_data
+
+    def get_connection_status(self):
+        now = time.time()
+        age_seconds = None
+        is_stale = False
+        has_messages = self.last_message_time > 0
+        is_connected = self.connected and has_messages
+
+        if has_messages:
+            age_seconds = round(now - self.last_message_time, 2)
+            if is_connected:
+                is_stale = age_seconds > self.telemetry_stale_after
+
+        return {
+            "connected": is_connected,
+            "is_stale": is_stale,
+            "last_message_age_seconds": age_seconds,
+            "telemetry_stale_after_seconds": self.telemetry_stale_after
+        }
     
     def set_distance_threshold(self, meters):
         self.distance_threshold = float(meters)

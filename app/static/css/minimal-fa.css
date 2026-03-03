@@ -72,6 +72,14 @@
     --fa: "\f0c1";
 }
 
+.fa-heart {
+    --fa: "\f004";
+}
+
+.fa-heart-crack {
+    --fa: "\f7a9";
+}
+
 .fa-tachometer {
     --fa: "\f62a";
 }
