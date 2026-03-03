@@ -145,6 +145,15 @@ def get_telemetry():
         'telemetry': mavlink_handler.get_telemetry()
     })
 
+@app.route('/api/server_time', methods=['GET'])
+def get_server_time():
+    now = datetime.now().astimezone()
+    return jsonify({
+        'success': True,
+        'server_time': now.strftime('%Y-%m-%d %H:%M:%S %Z'),
+        'server_epoch_ms': int(now.timestamp() * 1000)
+    })
+
 @app.route('/api/app_settings', methods=['GET'])
 def get_app_settings():
     settings = camera_service.settings_manager.get_app_settings_definitions()

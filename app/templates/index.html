@@ -49,6 +49,11 @@
                 </div>
             </div>
 
+            <div class="alert alert-light border text-center mb-4" role="status" aria-live="polite">
+                <div class="h5 mb-1">Server Time</div>
+                <div id="current-date-time" class="h2 mb-0"></div>
+            </div>
+
             <div class="card-body text-center">
                 <a href="https://github.com/Revive-Our-Gulf/avt-camera" target="_blank">Software</a> |
                 <a href="" target="_blank">Privacy Policy</a> |
@@ -116,4 +121,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='javascript/server_time.js') }}"></script>
 {% endblock %}
