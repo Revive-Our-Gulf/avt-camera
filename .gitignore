@@ -16,8 +16,4 @@ __pycache__/
 .env
 .vscode/
 .DS_Store
-*.tiff
-*.jpeg
-*.jpg
-*.png
 *.diff
