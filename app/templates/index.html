@@ -49,12 +49,18 @@
                 </div>
             </div>
 
+
             <div class="card-body text-center">
                 <a href="https://github.com/Revive-Our-Gulf/avt-camera" target="_blank">Software</a> |
                 <a href="" target="_blank">Privacy Policy</a> |
                 <a href="" target="_blank">User Agreement</a>
             </div>
             <hr>
+
+            <div class="text-center text-muted">
+                <small id="current-date-time"></small>
+            </div>
+
             <div class="text-center text-muted">
                 <small>Revive Our Gulf (c) 2025. BenthicCamera Software V1.0.0</small>
             </div>
@@ -116,4 +122,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='javascript/server_time.js') }}"></script>
 {% endblock %}

@@ -150,6 +150,14 @@ def get_mavlink_status():
     return jsonify({
         'success': True,
         'status': mavlink_handler.get_connection_status()
+      
+@app.route('/api/server_time', methods=['GET'])
+def get_server_time():
+    now = datetime.now().astimezone()
+    return jsonify({
+        'success': True,
+        'server_time': now.strftime('%Y-%m-%d %H:%M:%S %Z'),
+        'server_epoch_ms': int(now.timestamp() * 1000)
     })
 
 @app.route('/api/app_settings', methods=['GET'])
