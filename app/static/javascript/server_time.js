@@ -19,5 +19,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     updateDateTime();
-    setInterval(updateDateTime, 1000);
 });
