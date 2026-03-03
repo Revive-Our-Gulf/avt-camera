@@ -2,6 +2,8 @@ import threading
 import time
 import cv2
 import functools
+import os
+import sys
 from datetime import datetime
 from vmbpy import Camera, Stream, Frame, FrameStatus, VmbFeatureError, PixelFormat, VmbSystem
 from settings_manager import SettingsManager
@@ -114,12 +116,26 @@ class CameraHardwareController:
         thread.start()
         return thread
 
+    def _configure_vmb_system(self):
+        vmb = VmbSystem.get_instance()
+
+        if sys.platform.startswith("win"):
+            if os.getenv("GENICAM_GENTL64_PATH"):
+                return vmb
+
+            default_cti_dir = r"C:\Program Files\Allied Vision\Vimba X\cti"
+            if os.path.isdir(default_cti_dir):
+                print(f"Configuring Vimba TL path: {default_cti_dir}")
+                return vmb.set_path_configuration(default_cti_dir)
+
+        return vmb
+
     def _camera_thread(self):
         retry_count = 0
         max_retries = 20
         retry_delay = 5
-        
-        with VmbSystem.get_instance() as vmb:
+
+        with self._configure_vmb_system() as vmb:
             while retry_count < max_retries:
                 try:
                     print(f"Attempt {retry_count+1}: Trying to access camera in Full mode...")
